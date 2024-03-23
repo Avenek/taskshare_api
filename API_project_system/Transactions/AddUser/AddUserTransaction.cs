@@ -2,9 +2,9 @@
 using API_project_system.Repositories;
 using System.Transactions;
 
-namespace API_project_system.Transactions
+namespace API_project_system.Transactions.AddUser
 {
-    public class AddUserTransaction : ITransaction
+    public abstract class AddUserTransaction : ITransaction
     {
         private readonly IRepository<User> userRepository;
         private readonly User userToAdd;
@@ -17,7 +17,10 @@ namespace API_project_system.Transactions
 
         public void Execute()
         {
+            userToAdd.StatusId = MakeApprovalStatus();
             userRepository.Add(userToAdd);
         }
+
+        public abstract int MakeApprovalStatus();
     }
 }

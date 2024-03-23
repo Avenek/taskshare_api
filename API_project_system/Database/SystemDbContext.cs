@@ -12,6 +12,7 @@ namespace API_project_system.DbContexts
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<ApprovalStatus> ApprovalStatuses { get; set; }
 
         public SystemDbContext(DbContextOptions<SystemDbContext> options) : base(options)
         {

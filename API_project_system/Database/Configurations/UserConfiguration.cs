@@ -14,14 +14,22 @@ namespace API_project_system.Database.Configurations
 
             builder.Property(e => e.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
             builder.Property(e => e.Email).HasColumnName("email").IsRequired();
-            builder.Property(e => e.Nickname).HasColumnName("nick").IsRequired();
+            builder.Property(e => e.Name).HasColumnName("name").IsRequired();
+            builder.Property(e => e.Lastname).HasColumnName("Lastname").IsRequired();
             builder.Property(e => e.PasswordHash).HasColumnName("password_hash").IsRequired();
             builder.Property(e => e.RoleId).HasColumnName("role_id");
+            builder.Property(e => e.StatusId).HasColumnName("status_id");
 
             builder.HasOne(d => d.Role)
-            .WithMany(r => r.Users)
-            .HasForeignKey(d => d.RoleId)
-            .HasConstraintName("user_ibfk_1");
+                .WithMany(r => r.Users)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("user_ibfk_1");
+
+
+            builder.HasOne(d => d.Status)
+                .WithMany(r => r.Users)
+                .HasForeignKey(d => d.StatusId)
+                .HasConstraintName("user_ibfk_2");
         }
     }
 }

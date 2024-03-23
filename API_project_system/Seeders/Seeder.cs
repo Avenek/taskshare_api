@@ -30,13 +30,25 @@ namespace API_project_system.Seeders
                     dbContext.Roles.AddRange(roles);
                     dbContext.SaveChanges();
                 }
+                if (!dbContext.ApprovalStatuses.Any())
+                {
+                    var statuses = GetStatuses();
+                    dbContext.ApprovalStatuses.AddRange(statuses);
+                    dbContext.SaveChanges();
+                }
             }
         }
 
         private IEnumerable<Role> GetRoles()
         {
-            List<Role> roles = [new Role() { Name = "Admin" }, new Role() { Name = "User" }];
+            List<Role> roles = [new Role() { Name = "Admin" }, new Role() { Name = "Teacher" }, new Role() { Name = "Student" }];
             return roles;
+        }
+
+        private IEnumerable<ApprovalStatus> GetStatuses()
+        {
+            List<ApprovalStatus> statuses = [new ApprovalStatus() { Name = "Confirmed" }, new ApprovalStatus() { Name = "Needs confirmation" }];
+            return statuses;
         }
     }
 }

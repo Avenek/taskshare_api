@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API_project_system.Migrations
 {
     [DbContext(typeof(SystemDbContext))]
-    [Migration("20240323104310_Initial")]
+    [Migration("20240323125842_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -23,6 +23,25 @@ namespace API_project_system.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("API_project_system.Entities.ApprovalStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("approval_statuses", (string)null);
+                });
 
             modelBuilder.Entity("API_project_system.Entities.Role", b =>
                 {
@@ -57,10 +76,15 @@ namespace API_project_system.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("email");
 
-                    b.Property<string>("Nickname")
+                    b.Property<string>("Lastname")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasColumnName("nick");
+                        .HasColumnName("Lastname");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("name");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -71,7 +95,13 @@ namespace API_project_system.Migrations
                         .HasColumnType("int")
                         .HasColumnName("role_id");
 
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("status_id");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("StatusId");
 
                     b.HasIndex(new[] { "RoleId" }, "user_ibfk_1");
 
@@ -87,7 +117,21 @@ namespace API_project_system.Migrations
                         .IsRequired()
                         .HasConstraintName("user_ibfk_1");
 
+                    b.HasOne("API_project_system.Entities.ApprovalStatus", "Status")
+                        .WithMany("Users")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("user_ibfk_2");
+
                     b.Navigation("Role");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("API_project_system.Entities.ApprovalStatus", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("API_project_system.Entities.Role", b =>

@@ -24,22 +24,27 @@ namespace API_project_system.ModelsDto.Validators
                     }
                 });
 
-            RuleFor(x => x.Nickname)
-                .MinimumLength(3)
-                .Custom((value, context) =>
-                {
-                    bool nicknameInUse = unitOfWork.Users.Entity.Any(u => u.Nickname.ToString() == value);
-                    if (nicknameInUse)
-                    {
-                        context.AddFailure("Nickname", "That nickname is taken.");
-                    }
-                });
+            RuleFor(x => x.Name)
+                .MinimumLength(3);
+
+            RuleFor(x => x.Lastname)
+                .MinimumLength(3);
 
             RuleFor(x => x.Password)
                 .MinimumLength(6);
 
             RuleFor(x => x.ConfirmedPassword)
                 .Equal(e =>  e.Password);
+
+            RuleFor(x => x.RoleId)
+                .Custom((value, context) =>
+                {
+                    bool isCorrectRole = value > 0 && value <= unitOfWork.Roles.Entity.Count();
+                    if (!isCorrectRole)
+                    {
+                        context.AddFailure("RoleId", "That role doesn't exist.");
+                    }
+                });
         }
     }
 }

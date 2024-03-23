@@ -10,6 +10,7 @@ using API_project_system.Transactions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using API_project_system.Transactions.AddUser;
 
 namespace API_project_system.Services
 {
@@ -20,7 +21,6 @@ namespace API_project_system.Services
         string TryLoginUserAndGenerateJwt(LoginUserDto loginUserDto);
         bool VerifyUserLogPasses(string email, string password);
         string CreateJwtToken(User user);
-        void UpdateUser(int userId, UpdateUserDto updateUserDto);
     }
     public class AccountService : IAccountService
     {
@@ -42,10 +42,23 @@ namespace API_project_system.Services
             var newUser = mapper.Map<User>(registerUserDto);
             var hashedPassword = passwordHasher.HashPassword(newUser, registerUserDto.Password);
             newUser.PasswordHash = hashedPassword;
-            AddUserTransaction addUserTransaction = new(UnitOfWork.Users, newUser);
+            AddUserTransaction addUserTransaction = CreateAddUserTransaction(newUser);
             addUserTransaction.Execute();
             UnitOfWork.Commit();
 
+        }
+
+        private AddUserTransaction CreateAddUserTransaction(User userToAdd)
+        {
+            switch (userToAdd.RoleId)
+            {
+                case 1:
+                    throw new BadRequestException("Cannot creat admin.");
+                case 2:
+                    return new AddTeacherTransaction(UnitOfWork.Users, userToAdd);
+                default:
+                    return new AddStudentTransaction(UnitOfWork.Users, userToAdd);
+            }
         }
 
         public string TryLoginUserAndGenerateJwt(LoginUserDto loginUserDto)
@@ -79,7 +92,8 @@ namespace API_project_system.Services
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Nickname),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Surname, user.Lastname),
                 new Claim(ClaimTypes.Role, user.Role.Name)
             };
 
@@ -91,16 +105,6 @@ namespace API_project_system.Services
 
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(token);
-        }
-
-        public void UpdateUser(int userId, UpdateUserDto updateUserDto)
-        {
-            var updatedUser = mapper.Map<User>(updateUserDto);
-            var hashedPassword = passwordHasher.HashPassword(updatedUser, updateUserDto.Password);
-            updatedUser.PasswordHash = hashedPassword;
-            UpdateUserTransaction updateUserTransaction = new(UnitOfWork.Users, userId, updatedUser);
-            updateUserTransaction.Execute();
-            UnitOfWork.Commit();
         }
     }
 }

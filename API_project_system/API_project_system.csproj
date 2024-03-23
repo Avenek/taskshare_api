@@ -24,8 +24,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Entities\" />
     <Folder Include="MappingProfiles\" />
+    <Folder Include="Migrations\" />
     <Folder Include="ModelsDto\Validators\" />
     <Folder Include="Seeders\" />
     <Folder Include="Services\" />

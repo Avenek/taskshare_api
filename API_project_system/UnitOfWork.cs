@@ -7,6 +7,7 @@ public interface IUnitOfWork
 {
     IRepository<User> Users { get; }
     IRepository<Role> Roles { get; }
+    IRepository<ApprovalStatus> ApprovalStatuses { get; }
     void Commit();
 }
 public class UnitOfWork : IUnitOfWork
@@ -15,6 +16,7 @@ public class UnitOfWork : IUnitOfWork
     private readonly SystemDbContext dbContext;
     private Repository<User> users;
     private Repository<Role> roles;
+    private Repository<ApprovalStatus> approvalStatuses;
 
     public UnitOfWork(SystemDbContext dbContext)
     {
@@ -36,6 +38,15 @@ public class UnitOfWork : IUnitOfWork
         {
             return roles ??
                 (roles = new Repository<Role>(dbContext));
+        }
+    }
+
+    public IRepository<ApprovalStatus> ApprovalStatuses
+    {
+        get
+        {
+            return approvalStatuses ??
+                (approvalStatuses = new Repository<ApprovalStatus>(dbContext));
         }
     }
 
