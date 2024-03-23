@@ -10,7 +10,6 @@ namespace API_project_system.MappingProfiles
         public UserMappingProfile() 
         {
             CreateMap<RegisterUserDto, User>();
-            CreateMap<UpdateUserDto, User>();
         }
     }
 }
