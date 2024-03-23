@@ -1,0 +1,14 @@
+*appsettings*.json
+.vs/
+*.log
+*.config
+*Logs.txt
+*Settings.json
+*/wwwroot/*
+*Dockerfile
+*TestResult*
+/API_project_system/bin/*
+/API_project_system/obj/*
+/UnitTests/bin/*
+/UnitTests/obj/*
+
