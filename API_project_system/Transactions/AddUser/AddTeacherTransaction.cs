@@ -1,4 +1,5 @@
 ﻿using API_project_system.Entities;
+using API_project_system.Enums;
 using API_project_system.Repositories;
 
 namespace API_project_system.Transactions.AddUser
@@ -11,7 +12,7 @@ namespace API_project_system.Transactions.AddUser
 
         public override int MakeApprovalStatus()
         {
-            return 2;
+            return (int)ApprovalStatuses.NeedsConfirmation;
         }
     }
 }

@@ -17,7 +17,11 @@ namespace API_project_system.Repositories
         public void Add(TEntity entity)
         {
             Entity.Add(entity);
-            dbContext.SaveChanges();
+        }
+
+        public void AddRange(IEnumerable<TEntity> entities)
+        {
+            Entity.AddRange(entities);
         }
 
         public void Remove(int id)
@@ -26,7 +30,6 @@ namespace API_project_system.Repositories
             if (entity != null)
             {
                 dbContext.Remove(entity);
-                dbContext.SaveChanges();
             }
 
         }
@@ -40,5 +43,6 @@ namespace API_project_system.Repositories
         {
             return Entity.ToList();
         }
+
     }
 }

@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using API_project_system.Transactions.AddUser;
+using API_project_system.Enums;
 
 namespace API_project_system.Services
 {
@@ -52,9 +53,9 @@ namespace API_project_system.Services
         {
             switch (userToAdd.RoleId)
             {
-                case 1:
+                case (int)UserRoles.Admin:
                     throw new BadRequestException("Cannot creat admin.");
-                case 2:
+                case (int)UserRoles.Teacher:
                     return new AddTeacherTransaction(UnitOfWork.Users, userToAdd);
                 default:
                     return new AddStudentTransaction(UnitOfWork.Users, userToAdd);

@@ -6,6 +6,7 @@ namespace API_project_system.Repositories
     {
         DbSet<TEntity> Entity { get; }
         void Add(TEntity entity);
+        void AddRange(IEnumerable<TEntity> entities);
         void Remove(int id);
         TEntity GetById(int id);
         List<TEntity> GetAll();
