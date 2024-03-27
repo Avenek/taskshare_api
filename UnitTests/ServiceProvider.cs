@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using API_project_system;
 using Microsoft.Extensions.Configuration;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace UnitTests
 {
 

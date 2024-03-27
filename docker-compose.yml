@@ -40,8 +40,6 @@ services:
       always
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-    volumes:
-      - ./API_project_system/API_project_system/bin/Debug/net8.0:/app
     networks:
       - backend
       

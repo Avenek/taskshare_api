@@ -8,6 +8,7 @@
 *Dockerfile
 *TestResult*
 /API_project_system/bin/*
+/API_project_system/Migrations/*
 /API_project_system/obj/*
 /UnitTests/bin/*
 /UnitTests/obj/*
