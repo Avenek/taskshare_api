@@ -12,33 +12,41 @@ using System.Security.Claims;
 using System.Text;
 using API_project_system.Transactions.AddUser;
 using API_project_system.Enums;
+using API_project_system.Specifications;
+using API_project_system.Logger;
 
 namespace API_project_system.Services
 {
     public interface IAccountService
     {
         IUnitOfWork UnitOfWork { get; }
-        void RegisterUser(RegisterUserDto registerUserDto);
+        string RegisterAccount(RegisterUserDto registerUserDto);
         string TryLoginUserAndGenerateJwt(LoginUserDto loginUserDto);
-        bool VerifyUserLogPasses(string email, string password);
-        string CreateJwtToken(User user);
+        bool VerifyUserLogPasses(string email, string password, out User user);
+        string GetJwtTokenIfValid(string jwtToken);
+        void Logout(string jwtToken);
     }
     public class AccountService : IAccountService
     {
         public IUnitOfWork UnitOfWork { get; }
         private readonly IPasswordHasher<User> passwordHasher;
         private readonly IMapper mapper;
-        private readonly AuthenticationSettings authenticationSettings;
+        private readonly JwtTokenHelper jwtTokenHelper;
+        private readonly UserActionLogger logger;
+        private readonly IUserContextService userContextService;
 
-        public AccountService(IUnitOfWork unitOfWork, IPasswordHasher<User> passwordHasher, IMapper mapper, AuthenticationSettings authenticationSettings)
+        public AccountService(IUnitOfWork unitOfWork, IPasswordHasher<User> passwordHasher, IMapper mapper, JwtTokenHelper jwtTokenHelper,
+            UserActionLogger logger, IUserContextService userContextService)
         {
             UnitOfWork = unitOfWork;
             this.passwordHasher = passwordHasher;
             this.mapper = mapper;
-            this.authenticationSettings = authenticationSettings;
+            this.jwtTokenHelper = jwtTokenHelper;
+            this.logger = logger;
+            this.userContextService = userContextService;
         }
 
-        public void RegisterUser(RegisterUserDto registerUserDto)
+        public string RegisterAccount(RegisterUserDto registerUserDto)
         {
             var newUser = mapper.Map<User>(registerUserDto);
             var hashedPassword = passwordHasher.HashPassword(newUser, registerUserDto.Password);
@@ -46,7 +54,9 @@ namespace API_project_system.Services
             AddUserTransaction addUserTransaction = CreateAddUserTransaction(newUser);
             addUserTransaction.Execute();
             UnitOfWork.Commit();
-
+            logger.Log(EUserAction.Registration, addUserTransaction.UserToAdd.Id, DateTime.UtcNow);
+            var token = jwtTokenHelper.CreateJwtToken(newUser);
+            return token;
         }
 
         private AddUserTransaction CreateAddUserTransaction(User userToAdd)
@@ -64,10 +74,10 @@ namespace API_project_system.Services
 
         public string TryLoginUserAndGenerateJwt(LoginUserDto loginUserDto)
         {
-            if(VerifyUserLogPasses(loginUserDto.Email, loginUserDto.Password))
+            if (VerifyUserLogPasses(loginUserDto.Email, loginUserDto.Password, out User user))
             {
-                var user = UnitOfWork.Users.Entity.Include(u => u.Role).FirstOrDefault(u => u.Email == loginUserDto.Email);
-                var token = CreateJwtToken(user);
+                var token = jwtTokenHelper.CreateJwtToken(user);
+                logger.Log(EUserAction.Login, user.Id, DateTime.UtcNow);
                 return token;
             }
             else
@@ -76,9 +86,10 @@ namespace API_project_system.Services
             }
         }
 
-        public bool VerifyUserLogPasses(string email, string password)
+        public bool VerifyUserLogPasses(string email, string password, out User user)
         {
-            var user = UnitOfWork.Users.Entity.FirstOrDefault(u => u.Email == email);
+            var spec = new UserByEmailWithRoleSpecification(email);
+            user = UnitOfWork.Users.GetBySpecification(spec).FirstOrDefault();
 
             if (user is null)
             {
@@ -88,24 +99,28 @@ namespace API_project_system.Services
             return result == PasswordVerificationResult.Success;
         }
 
-        public string CreateJwtToken(User user)
+        public string GetJwtTokenIfValid(string jwtToken)
         {
-            var claims = new List<Claim>()
+            var isTokenValid = jwtTokenHelper.IsTokenValid(jwtToken);
+            if (!isTokenValid)
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Surname, user.Lastname),
-                new Claim(ClaimTypes.Role, user.Role.Name)
-            };
+                throw new BadRequestException("Token has already expired.");
+            }
+            var userId = userContextService.GetUserId;
+            var spec = new UserByIdWithRoleSpecification(userId);
+            var user = UnitOfWork.Users.GetBySpecification(spec).FirstOrDefault();
+            string token = jwtTokenHelper.CreateJwtToken(user);
+            logger.Log(EUserAction.RefreshToken, userId, DateTime.UtcNow);
+            return token;
+        }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddDays(authenticationSettings.JwtExpireDays);
-
-            var token = new JwtSecurityToken(authenticationSettings.JwtIssuer, authenticationSettings.JwtIssuer, claims, expires: expires, signingCredentials: credentials);
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.WriteToken(token);
+        public void Logout(string jwtToken)
+        {
+            var userId = userContextService.GetUserId;
+            AddBlackListedTokenTransaction addBlackListedTokenTransaction = new(UnitOfWork.BlackListedTokens, userId, jwtToken);
+            addBlackListedTokenTransaction.Execute();
+            UnitOfWork.Commit();
+            logger.Log(EUserAction.LogoutUser, userId, DateTime.UtcNow);
         }
     }
 }

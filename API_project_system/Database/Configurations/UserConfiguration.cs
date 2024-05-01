@@ -39,7 +39,7 @@ namespace API_project_system.Database.Configurations
 
 			builder.HasMany(e => e.OwnedCourses)
 				.WithOne(e => e.Owner)
-				.HasForeignKey(e => e.OwnerId);
+				.HasForeignKey(e => e.UserId);
 
 		}
 	}

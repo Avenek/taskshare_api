@@ -7,18 +7,18 @@ namespace API_project_system.Transactions.AddUser
     public abstract class AddUserTransaction : ITransaction
     {
         private readonly IRepository<User> userRepository;
-        private readonly User userToAdd;
+        public User UserToAdd;
 
         public AddUserTransaction(IRepository<User> userRepository, User userToAdd)
         {
             this.userRepository = userRepository;
-            this.userToAdd = userToAdd;
+            this.UserToAdd = userToAdd;
         }
 
         public void Execute()
         {
-            userToAdd.StatusId = MakeApprovalStatus();
-            userRepository.Add(userToAdd);
+            UserToAdd.StatusId = MakeApprovalStatus();
+            userRepository.Add(UserToAdd);
         }
 
         public abstract int MakeApprovalStatus();

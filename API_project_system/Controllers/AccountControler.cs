@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API_project_system.ModelsDto;
 using API_project_system.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API_project_system.Controllers
 {
@@ -16,17 +18,35 @@ namespace API_project_system.Controllers
         }
 
         [HttpPost("register")]
-        public ActionResult RegisterUser([FromBody] RegisterUserDto registerUserDto)
+        [AllowAnonymous]
+        public ActionResult RegisterAccount([FromBody] RegisterUserDto registerUserDto)
         {
-            accountService.RegisterUser(registerUserDto);
-            return Ok();
+            string token = accountService.RegisterAccount(registerUserDto);
+            return Ok(token);
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public ActionResult Login([FromBody] LoginUserDto loginUserDto)
         {
             string token = accountService.TryLoginUserAndGenerateJwt(loginUserDto);
             return Ok(token);
+        }
+
+        [HttpGet("token")]
+        public async Task<ActionResult> IsTokenValidAsync()
+        {
+            var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
+            string token = accountService.GetJwtTokenIfValid(accessToken);
+            return Ok(token);
+        }
+
+        [HttpPost("logout")]
+        public async Task<ActionResult> LogoutAsync()
+        {
+            var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
+            accountService.Logout(accessToken);
+            return Ok();
         }
     }
 }

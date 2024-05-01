@@ -16,8 +16,9 @@
 		public virtual Role Role { get; set; }
 
 		public virtual ICollection<Course> OwnedCourses { get; set; }
-
-		public virtual ICollection<Course> EnrolledCourses { get; set; }
+        public virtual ICollection<BlackListedToken> BlackListedTokens { get; set; } = new List<BlackListedToken>();
+        public virtual ICollection<UserLog> Logs { get; set; } = new List<UserLog>();
+        public virtual ICollection<Course> EnrolledCourses { get; set; }
 		public virtual ICollection<Course> PendingCourses { get; set; }
 
 		public virtual ICollection<Submission> Submissions { get; set; }

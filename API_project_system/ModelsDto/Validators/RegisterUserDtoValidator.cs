@@ -17,11 +17,11 @@ namespace API_project_system.ModelsDto.Validators
                 .EmailAddress()
                 .Custom((value, context) =>
                 {
-                    bool emailInUse = unitOfWork.Users.Entity.Any(u => u.Email.ToString() == value);
-                    if(emailInUse)
-                    {
-                        context.AddFailure("Email", "That email is taken.");
-                    }
+                     bool emailInUse = unitOfWork.Users.Entity.Any(u => u.Email == value);
+                     if (emailInUse)
+                     {
+                         context.AddFailure("Email", "That email is taken.");
+                     }
                 });
 
             RuleFor(x => x.Name)

@@ -13,7 +13,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 		builder.Property(e => e.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
 		builder.Property(e => e.Name).HasColumnName("name").IsRequired();
 		builder.Property(e => e.IconPath).HasColumnName("icon_path");
-		builder.Property(e => e.OwnerId).HasColumnName("owner_id").IsRequired();
+		builder.Property(e => e.UserId).HasColumnName("owner_id").IsRequired();
 
 		builder.HasMany(e => e.Assignments)
 			.WithOne(e => e.Course)
@@ -29,6 +29,6 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
 		builder.HasOne(a => a.Owner)
 		   .WithMany(c => c.OwnedCourses)
-		   .HasForeignKey(a => a.OwnerId);
+		   .HasForeignKey(a => a.UserId);
 	}
 }

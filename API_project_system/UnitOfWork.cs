@@ -1,30 +1,40 @@
 ﻿using API_project_system.DbContexts;
 using API_project_system.Entities;
 using API_project_system.Repositories;
+using API_project_system.Entities;
 
 
 public interface IUnitOfWork
 {
+    int UserId { get; set; }
     IRepository<User> Users { get; }
+    IRepository<BlackListedToken> BlackListedTokens { get; }
     IRepository<Role> Roles { get; }
     IRepository<ApprovalStatus> ApprovalStatuses { get; }
     IRepository<Assignment> Assignments { get; }
     IRepository<Course> Courses { get; }
     IRepository<Submission> Submissions { get; }
     IRepository<SubmissionFile> SubmissionFiles { get; }
+    IRepository<UserAction> UserActions { get; }
+    IRepository<UserLog> UserLogs { get; }
     void Commit();
 }
 public class UnitOfWork : IUnitOfWork
 {
-
     private readonly SystemDbContext dbContext;
+
+    public int UserId { get; set; }
+
     private IRepository<User> users;
+    private Repository<BlackListedToken> blackListedTokens;
     private IRepository<Role> roles;
     private IRepository<ApprovalStatus> approvalStatuses;
     private IRepository<Assignment> assignments;
     private IRepository<Course> courses;
     private IRepository<Submission> submissions;
     private IRepository<SubmissionFile> submissionFiles;
+    private Repository<UserAction> userActions;
+    private Repository<UserLog> userLogs;
 
     public UnitOfWork(SystemDbContext dbContext)
     {
@@ -37,6 +47,15 @@ public class UnitOfWork : IUnitOfWork
         {
             return users ??
                 (users = new Repository<User>(dbContext));
+        }
+    }
+
+    public IRepository<BlackListedToken> BlackListedTokens
+    {
+        get
+        {
+            return blackListedTokens ??
+                (blackListedTokens = new Repository<BlackListedToken>(dbContext));
         }
     }
 
@@ -91,6 +110,24 @@ public class UnitOfWork : IUnitOfWork
         {
             return submissionFiles ??
                 (submissionFiles = new Repository<SubmissionFile>(dbContext));
+        }
+    }
+
+    public IRepository<UserAction> UserActions
+    {
+        get
+        {
+            return userActions ??
+                (userActions = new Repository<UserAction>(dbContext));
+        }
+    }
+
+    public IRepository<UserLog> UserLogs
+    {
+        get
+        {
+            return userLogs ??
+                (userLogs = new Repository<UserLog>(dbContext));
         }
     }
 

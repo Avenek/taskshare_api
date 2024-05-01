@@ -1,6 +1,6 @@
 namespace API_project_system.Entities;
 
-public class Submission
+public class Submission : IHasUserId
 {
 	public int Id { get; set; }
 	public int UserId { get; set; }
