@@ -9,10 +9,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 using API_project_system.Entities;
 using API_project_system.Exceptions;
 using API_project_system.ModelsDto.Validators;
-using API_project_system.ModelsDto;
 using API_project_system.Services;
 using API_project_system;
 using API_project_system.Logger;
+using API_project_system.ModelsDto;
 
 namespace UnitTests
 {
@@ -24,9 +24,9 @@ namespace UnitTests
         private readonly IValidator<RegisterUserDto> registerValidator;
         private readonly IMapper mapper;
         private readonly JwtTokenHelper jwtTokenHelper;
-        private IUnitOfWork unitOfWork;
-        private UserActionLogger logger;
-        private IUserContextService userContextService;
+        private readonly IUnitOfWork unitOfWork;
+        private readonly UserActionLogger logger;
+        private readonly IUserContextService userContextService;
         public AccountServiceTests()
         {
             unitOfWork = Helper.CreateUnitOfWork();

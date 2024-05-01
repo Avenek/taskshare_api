@@ -26,7 +26,6 @@
   <ItemGroup>
     <Folder Include="MappingProfiles\" />
     <Folder Include="Migrations\" />
-    <Folder Include="ModelsDto\Validators\" />
     <Folder Include="Seeders\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>

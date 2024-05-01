@@ -6,7 +6,6 @@ using API_project_system.Entities;
 using API_project_system.MappingProfiles;
 using API_project_system.Middleware;
 using API_project_system.ModelsDto.Validators;
-using API_project_system.ModelsDto;
 using API_project_system.Repositories;
 using API_project_system.Services;
 using System;
@@ -22,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Moq;
 using API_project_system.Registrars;
+using API_project_system.ModelsDto;
 namespace UnitTests
 {
 

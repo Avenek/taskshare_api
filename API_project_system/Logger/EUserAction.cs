@@ -9,5 +9,8 @@
         LogoutUser,
         UpdateUser,
         DeleteUser,
+        CreateCourse,
+        UpdateCourse,
+        DeleteCourse,
     }
 }

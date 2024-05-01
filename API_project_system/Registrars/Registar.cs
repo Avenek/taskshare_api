@@ -19,7 +19,7 @@ namespace API_project_system.Registrars
             services.AddServicesFromAssembly(assembly);
             services.AddRepositoriesFromAssembly(assembly);
             services.AddMappersFromAssembly(assembly);
-            services.AddMainRegistarsFromAssembly(assembly);
+            services.AddMainRegistars();
         }
     }
 }

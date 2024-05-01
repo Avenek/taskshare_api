@@ -5,12 +5,13 @@ using API_project_system.Middleware;
 using API_project_system.Seeders;
 using System.Reflection;
 using API_project_system.Logger;
+using API_project_system.Authorization;
 
 namespace API_project_system.Registrars.Extensions
 {
     public static class MainExtension
     {
-        public static void AddMainRegistarsFromAssembly(this IServiceCollection services, Assembly assembly)
+        public static void AddMainRegistars(this IServiceCollection services)
         {
             services.AddScoped<Seeder>();
             services.AddScoped<JwtTokenHelper>();
@@ -18,6 +19,7 @@ namespace API_project_system.Registrars.Extensions
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddHttpContextAccessor();
+            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler> ();
 
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         }
