@@ -9,5 +9,5 @@ public class Submission : IHasUserId
 	public virtual Assignment Assignment { get; set; }
 	public DateTime SubmissionDateTime { get; set; }
 	public string StudentComment { get; set; }
-	public virtual ICollection<SubmissionFile> Files { get; set; }
+	public virtual ICollection<SubmissionFile> Files { get; set; } = new List<SubmissionFile>();
 }

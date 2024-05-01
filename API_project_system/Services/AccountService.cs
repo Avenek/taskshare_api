@@ -4,16 +4,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using API_project_system.Entities;
 using API_project_system.Exceptions;
-using API_project_system.ModelsDto;
 using API_project_system.Repositories;
 using API_project_system.Transactions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using API_project_system.Transactions.AddUser;
 using API_project_system.Enums;
 using API_project_system.Specifications;
 using API_project_system.Logger;
+using API_project_system.ModelsDto;
+using API_project_system.Transactions.AddUser;
 
 namespace API_project_system.Services
 {
@@ -22,7 +22,7 @@ namespace API_project_system.Services
         IUnitOfWork UnitOfWork { get; }
         string RegisterAccount(RegisterUserDto registerUserDto);
         string TryLoginUserAndGenerateJwt(LoginUserDto loginUserDto);
-        bool VerifyUserLogPasses(string email, string password, out User user);
+        bool VerifyUserLogPasses(string email, string password, out User? user);
         string GetJwtTokenIfValid(string jwtToken);
         void Logout(string jwtToken);
     }
@@ -74,7 +74,7 @@ namespace API_project_system.Services
 
         public string TryLoginUserAndGenerateJwt(LoginUserDto loginUserDto)
         {
-            if (VerifyUserLogPasses(loginUserDto.Email, loginUserDto.Password, out User user))
+            if (VerifyUserLogPasses(loginUserDto.Email, loginUserDto.Password, out User? user))
             {
                 var token = jwtTokenHelper.CreateJwtToken(user);
                 logger.Log(EUserAction.Login, user.Id, DateTime.UtcNow);
@@ -86,7 +86,7 @@ namespace API_project_system.Services
             }
         }
 
-        public bool VerifyUserLogPasses(string email, string password, out User user)
+        public bool VerifyUserLogPasses(string email, string password, out User? user)
         {
             var spec = new UserByEmailWithRoleSpecification(email);
             user = UnitOfWork.Users.GetBySpecification(spec).FirstOrDefault();

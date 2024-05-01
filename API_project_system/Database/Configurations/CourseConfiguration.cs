@@ -19,15 +19,29 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 			.WithOne(e => e.Course)
 			.HasForeignKey(e => e.CourseId);
 
-		builder.HasMany(e => e.EnrolledUsers)
-			.WithMany(e => e.EnrolledCourses)
-			.UsingEntity("courses_enrolled_users");
+        builder.HasMany(i => i.PendingUsers)
+                              .WithMany(t => t.PendingCourses)
+                              .UsingEntity<CoursePendingUser>(
+                                  j => j.HasOne(pt => pt.User).WithMany().HasForeignKey(pt => pt.UserId),
+                                  j => j.HasOne(pt => pt.Course).WithMany().HasForeignKey(pt => pt.CourseId),
+                                  j =>
+                                  {
+                                      j.HasKey(pt => new { pt.UserId, pt.CourseId });
+                                      j.ToTable("course_pending_users");
+                                  });
 
-		builder.HasMany(e => e.PendingUsers)
-			.WithMany(e => e.PendingCourses)
-			.UsingEntity("courses_pending_users");
+        builder.HasMany(i => i.EnrolledUsers)
+                              .WithMany(t => t.EnrolledCourses)
+                              .UsingEntity<CourseEnrolledUser>(
+                                  j => j.HasOne(pt => pt.User).WithMany().HasForeignKey(pt => pt.UserId),
+                                  j => j.HasOne(pt => pt.Course).WithMany().HasForeignKey(pt => pt.CourseId),
+                                  j =>
+                                  {
+                                      j.HasKey(pt => new { pt.UserId, pt.CourseId });
+                                      j.ToTable("course_enrolled_users");
+                                  });
 
-		builder.HasOne(a => a.Owner)
+        builder.HasOne(a => a.Owner)
 		   .WithMany(c => c.OwnedCourses)
 		   .HasForeignKey(a => a.UserId);
 	}

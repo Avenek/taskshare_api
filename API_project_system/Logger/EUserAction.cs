@@ -7,5 +7,7 @@
         Login,
         RefreshToken,
         LogoutUser,
+        UpdateUser,
+        DeleteUser,
     }
 }

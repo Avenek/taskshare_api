@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using API_project_system.Entities;
-using API_project_system.ModelsDto;
 using System.Security.Cryptography;
+using API_project_system.ModelsDto;
 
 namespace API_project_system.MappingProfiles
 {
@@ -10,6 +10,8 @@ namespace API_project_system.MappingProfiles
         public UserMappingProfile() 
         {
             CreateMap<RegisterUserDto, User>();
+            CreateMap<UpdateUserDto, User>();
+            CreateMap<User, UserDto>();
         }
     }
 }

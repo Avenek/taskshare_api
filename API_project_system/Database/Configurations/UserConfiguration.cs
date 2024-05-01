@@ -29,14 +29,6 @@ namespace API_project_system.Database.Configurations
 				.HasForeignKey(d => d.StatusId)
 				.HasConstraintName("user_ibfk_2");
 
-			builder.HasMany(e => e.EnrolledCourses)
-				.WithMany(e => e.EnrolledUsers)
-				.UsingEntity("courses_enrolled_users");
-
-			builder.HasMany(e => e.PendingCourses)
-				.WithMany(e => e.PendingUsers)
-				.UsingEntity("courses_pending_users");
-
 			builder.HasMany(e => e.OwnedCourses)
 				.WithOne(e => e.Owner)
 				.HasForeignKey(e => e.UserId);

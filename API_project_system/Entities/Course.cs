@@ -7,7 +7,7 @@ public class Course : IHasUserId
 	public string IconPath { get; set; }
 	public int UserId { get; set; }
 	public virtual User Owner { get; set; }
-	public virtual ICollection<User> EnrolledUsers { get; set; }
-	public virtual ICollection<User> PendingUsers { get; set; }
-	public virtual ICollection<Assignment> Assignments { get; set; }
+	public virtual ICollection<User> EnrolledUsers { get; set; } = new List<User>();
+	public virtual ICollection<User> PendingUsers { get; set; } = new List<User>();
+    public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
 }

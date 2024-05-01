@@ -39,7 +39,7 @@ namespace API_project_system.Repositories
 
         public TEntity GetById(int id)
         {
-            TEntity entity = Entity.Find(id);
+            TEntity? entity = Entity.Find(id);
             if (entity is null)
             {
                 throw new NotFoundException("That entity doesn't exist.");

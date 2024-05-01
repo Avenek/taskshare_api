@@ -9,5 +9,5 @@ public class Assignment
 	public string Description { get; set; }
 	public int CourseId { get; set; }
 	public virtual Course Course { get; set; }
-	public virtual ICollection<Submission> Submissions { get; set; }
+	public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }

@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using API_project_system.DbContexts;
 using API_project_system.Entities;
-using System.Security.Cryptography;
 using API_project_system.Logger;
-using API_project_system.Entities;
 
 namespace API_project_system.Seeders
 {

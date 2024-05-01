@@ -24,13 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="MappingProfiles\" />
     <Folder Include="Migrations\" />
     <Folder Include="ModelsDto\Validators\" />
-    <Folder Include="Specifications\" />
     <Folder Include="Seeders\" />
-    <Folder Include="Services\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

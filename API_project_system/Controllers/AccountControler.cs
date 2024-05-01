@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using API_project_system.ModelsDto;
 using API_project_system.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using API_project_system.ModelsDto;
 
 namespace API_project_system.Controllers
 {
     [Route("api/account")]
     [ApiController]
+    [Authorize]
     public class AccountControler : ControllerBase
     {
         private readonly IAccountService accountService;
