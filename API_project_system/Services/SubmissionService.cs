@@ -88,7 +88,7 @@ namespace API_project_system.Services
 
                     UploadSubmissionFileTransaction uploadSubmissionFileTransaction = new UploadSubmissionFileTransaction(UnitOfWork, submissionId, filePath);
                     uploadSubmissionFileTransaction.Execute();
-
+                    UnitOfWork.Commit();
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
@@ -99,7 +99,6 @@ namespace API_project_system.Services
                     throw new BadRequestException("Empty file.");
                 }
             }
-            UnitOfWork.Commit();
         }
 
         private string CreateAssignmentDirectoryPath(Assignment assignment) =>
