@@ -34,7 +34,6 @@ namespace API_project_system.Controllers
         }
 
         [HttpGet("logged")]
-
         public ActionResult GetLoggedUserAsync()
         {
             var user = userService.GetLoggedUser();

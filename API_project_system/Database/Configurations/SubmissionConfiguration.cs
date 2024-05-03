@@ -13,11 +13,13 @@ public class SubmissionConfiguration : IEntityTypeConfiguration<Submission>
 		builder.Property(e => e.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
 		builder.Property(e => e.UserId).HasColumnName("user_id").IsRequired();
 		builder.Property(e => e.SubmissionDateTime).HasColumnName("submission_date_time").IsRequired();
-		builder.Property(e => e.StudentComment).HasColumnName("student_comment");
+        builder.Property(e => e.LastEdit).HasColumnName("last_edit").IsRequired();
+        builder.Property(e => e.StudentComment).HasColumnName("student_comment");
 
 		builder.HasMany(e => e.Files)
 			.WithOne(e => e.Submission)
-			.HasForeignKey(e => e.SubmissionId);
+			.HasForeignKey(e => e.SubmissionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
 		builder.HasOne(a => a.User)
 		   .WithMany(c => c.Submissions)

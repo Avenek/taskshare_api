@@ -19,6 +19,7 @@ namespace API_project_system.Transactions.Submissions
         {
             SubmissionToAdd.UserId = userId;
             SubmissionToAdd.SubmissionDateTime = DateTime.Now;
+            SubmissionToAdd.LastEdit = DateTime.Now;
             unitOfWork.Submissions.Add(SubmissionToAdd);
         }
     }

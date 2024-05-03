@@ -16,6 +16,7 @@ public class SubmissionFileConfiguration : IEntityTypeConfiguration<SubmissionFi
 
 		builder.HasOne(a => a.Submission)
 		   .WithMany(c => c.Files)
-		   .HasForeignKey(a => a.SubmissionId);
+		   .HasForeignKey(a => a.SubmissionId)
+		   .OnDelete(DeleteBehavior.Cascade);
 	}
 }

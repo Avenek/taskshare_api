@@ -18,12 +18,10 @@ namespace API_project_system.Middleware
             try
             {
                 var jwtToken = context.Request.Headers["Authorization"].ToString()?.Split(" ").LastOrDefault();
-                if (!string.IsNullOrEmpty(jwtToken))
+                if (!string.IsNullOrEmpty(jwtToken) &&
+                    unitOfWork.BlackListedTokens.Entity.Any(token => token.Token.Equals(jwtToken)))
                 {
-                    if (unitOfWork.BlackListedTokens.Entity.Any(token => token.Token.Equals(jwtToken)))
-                    {
-                        throw new ForbidException("Unauthorized: Token is blacklisted.");
-                    }
+                    throw new ForbidException("Unauthorized: Token is blacklisted.");
                 }
 
                 await next.Invoke(context);

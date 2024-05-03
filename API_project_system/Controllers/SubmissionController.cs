@@ -19,7 +19,13 @@ namespace API_project_system.Controllers
             this.submissionService = submissionService;
         }
 
-        
+        [HttpGet("{submissionId}")]
+        public ActionResult GetById(int submissionId)
+        {
+            var submission = submissionService.GetById(submissionId);
+            return Ok(submission);
+        }
+
         [HttpPost()]
         public ActionResult CreateSubmission([FromBody] AddSubmissionDto addSubmissionDto)
         {

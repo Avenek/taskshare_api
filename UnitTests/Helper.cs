@@ -61,7 +61,7 @@ namespace UnitTests
             var roles = GetRoles();
             dbContext.Roles.AddRange(roles);
             dbContext.SaveChanges();
-            return new UnitOfWork(dbContext) { UserId = 1 };
+            return new UnitOfWork(dbContext);
         }
 
         public static IUserContextService CreateMockIUserContextService()

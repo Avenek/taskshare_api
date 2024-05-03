@@ -24,6 +24,7 @@ namespace API_project_system.Services
         public void DeleteSubmission(int submissionId);
         public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateCoursedto);
         void DeleteFileFromSubmission(int fileId);
+        SubmissionDto GetById(int submissionId);
     }
     public class SubmissionService : ISubmissionService
     {
@@ -42,6 +43,15 @@ namespace API_project_system.Services
             this.logger = logger;
             this.userContextService = userContextService;
             this.authorizationService = authorizationService;
+        }
+        public SubmissionDto GetById(int submissionId)
+        {
+            var userId = userContextService.GetUserId;
+            Submission submission = GetSubmissionIfBelongsToUser(userId, submissionId);
+            submission.Files.Select(f => f.FilePath = Path.GetFileName(f.FilePath));
+            var submissionDto = mapper.Map<SubmissionDto>(submission);
+
+            return submissionDto;
         }
 
         public int CreateSubmission(AddSubmissionDto addSubmissionDto)
@@ -158,7 +168,17 @@ namespace API_project_system.Services
 
         public void DeleteSubmission(int submissionId)
         {
-            throw new NotImplementedException();
+            var userId = userContextService.GetUserId;
+            Submission submissionToRemove = GetSubmissionIfBelongsToUser(userId, submissionId);
+            foreach(var file in submissionToRemove.Files)
+            {
+                File.Delete(file.FilePath);
+
+            }
+            DeleteEntityTransaction<Submission> deleteCourseTransaction = new(UnitOfWork.Submissions, submissionToRemove.Id);
+            deleteCourseTransaction.Execute();
+            UnitOfWork.Commit();
+            logger.Log(EUserAction.DeleteSubmission, userId, DateTime.UtcNow, submissionId);
         }
 
         public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateCoursedto)
@@ -180,6 +200,22 @@ namespace API_project_system.Services
             }
 
             return submissionFile;
+        }
+
+        private Submission GetSubmissionIfBelongsToUser(int userId, int submissionId)
+        {
+            var spec = new SubmissionByIdWithFiles(submissionId);
+            Submission submission = UnitOfWork.Submissions.GetBySpecification(spec).FirstOrDefault();
+            if (submission is null)
+            {
+                throw new NotFoundException("That entity doesn't exist.");
+            }
+            if (submission.UserId != userId)
+            {
+                throw new ForbidException("Cannot access to this file.");
+            }
+
+            return submission;
         }
     }
 }
