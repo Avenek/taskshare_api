@@ -2,5 +2,6 @@
 {
     public class UpdateSubmissionDto
     {
+        public string StudentComment { get; set; }
     }
 }

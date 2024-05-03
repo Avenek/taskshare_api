@@ -22,7 +22,7 @@ namespace API_project_system.Services
         public int CreateSubmission(AddSubmissionDto addSubmissionDto);
         public Task UploadFilesToSubmissionAsync(int submissionId, IFormFileCollection filesToUpload);
         public void DeleteSubmission(int submissionId);
-        public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateCoursedto);
+        public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateSubmissionDto);
         void DeleteFileFromSubmission(int fileId);
         SubmissionDto GetById(int submissionId);
     }
@@ -181,9 +181,14 @@ namespace API_project_system.Services
             logger.Log(EUserAction.DeleteSubmission, userId, DateTime.UtcNow, submissionId);
         }
 
-        public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateCoursedto)
+        public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateSubmissionDto)
         {
-            throw new NotImplementedException();
+            var userId = userContextService.GetUserId;
+            Submission submissionToUpdate = GetSubmissionIfBelongsToUser(userId, submissionId);
+            UpdateSubmissionTransaction updateSubmissionTransaction = new(submissionToUpdate, updateSubmissionDto.StudentComment);
+            updateSubmissionTransaction.Execute();
+            UnitOfWork.Commit();
+            logger.Log(EUserAction.UpdateSubmission, userId, DateTime.UtcNow, submissionId);
         }
 
         private SubmissionFile GetFileIfBelongsToUser(int userId, int fileId)

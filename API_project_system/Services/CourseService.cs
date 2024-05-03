@@ -26,7 +26,7 @@ namespace API_project_system.Services
         public CourseDto GetById(int courseId);
         public Course CreateCourse(AddCourseDto addCourseDto);
         public void DeleteCourse(int courseId);
-        public void UpdateCourse(int courseId, UpdateCourseDto updateCoursedto);
+        public void UpdateCourse(int courseId, UpdateCourseDto updateCourseDto);
     }
     public class CourseService : ICourseService
     {
