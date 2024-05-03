@@ -19,7 +19,8 @@ namespace API_project_system.Registrars.Extensions
             services.AddScoped<ErrorHandlingMiddleware>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddHttpContextAccessor();
-            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler> ();
+            services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
+            services.AddScoped<IAuthorizationHandler, UserEnrolledToCourseRequirementHandler>();
 
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         }

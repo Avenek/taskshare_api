@@ -7,6 +7,7 @@ namespace API_project_system.Transactions.Submissions
         private readonly IUnitOfWork unitOfWork;
         private readonly int submissionId;
         private readonly string path;
+        public SubmissionFile FileToAdd;
 
         public UploadSubmissionFileTransaction(IUnitOfWork unitOfWork, int submissionId, string path)
         {
@@ -17,8 +18,9 @@ namespace API_project_system.Transactions.Submissions
 
         public void Execute()
         {
-           SubmissionFile submissionFile = new SubmissionFile() { SubmissionId = submissionId, FilePath = path };
-           unitOfWork.SubmissionFiles.Add(submissionFile);
+            SubmissionFile submissionFile = new SubmissionFile() { SubmissionId = submissionId, FilePath = path };
+            unitOfWork.SubmissionFiles.Add(submissionFile);
+            FileToAdd = submissionFile;
         }
     }
 }

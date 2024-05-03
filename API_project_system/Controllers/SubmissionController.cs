@@ -35,12 +35,18 @@ namespace API_project_system.Controllers
             return Ok();
         }
 
+        [HttpDelete("{submissionId}/file/{fileId}")]
+        public ActionResult DeleteFileFromSubmission(int submissionId, int fileId)
+        {
+            submissionService.DeleteFileFromSubmission(fileId);
+            return NoContent();
+        }
+
         [HttpDelete("{submissionId}")]
         public ActionResult DeleteSubmission(int submissionId)
         {
             submissionService.DeleteSubmission(submissionId);
             return NoContent();
-
         }
 
         [HttpPut("{submissionId}")]

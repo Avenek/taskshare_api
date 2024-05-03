@@ -15,5 +15,7 @@
         AddSubmission,
         UpdateSubmission,
         DeleteSubmission,
+        UploadFile,
+        DeleteFile,
     }
 }
