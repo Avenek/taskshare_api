@@ -49,6 +49,8 @@ namespace API_project_system.Services
         public string RegisterAccount(RegisterUserDto registerUserDto)
         {
             var newUser = mapper.Map<User>(registerUserDto);
+            var role = UnitOfWork.Roles.GetById(newUser.RoleId);
+            newUser.Role = role;
             var hashedPassword = passwordHasher.HashPassword(newUser, registerUserDto.Password);
             newUser.PasswordHash = hashedPassword;
             AddUserTransaction addUserTransaction = CreateAddUserTransaction(newUser);

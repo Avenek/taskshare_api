@@ -5,7 +5,6 @@ using API_project_system.Exceptions;
 using API_project_system.Logger;
 using API_project_system.ModelsDto;
 using API_project_system.ModelsDto.CourseDto;
-using API_project_system.ModelsDto.RepositoryDto;
 using API_project_system.Specifications;
 using API_project_system.Specifications.CourseSpecifications;
 using API_project_system.Specifications.RepositorySpecification;
@@ -19,6 +18,7 @@ namespace API_project_system.Services
 {
     public interface ICourseService
     {
+        public IUnitOfWork UnitOfWork { get; }
         public PageResults<CourseDto> GetAll(GetAllQuery queryParameters);
         public PageResults<CourseDto> GetAllEnrolledByUser(GetAllQuery queryParameters);
         public PageResults<CourseDto> GetAllPendingByUser(GetAllQuery queryParameters);

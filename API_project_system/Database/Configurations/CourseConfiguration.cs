@@ -14,8 +14,9 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 		builder.Property(e => e.Name).HasColumnName("name").IsRequired();
 		builder.Property(e => e.IconPath).HasColumnName("icon_path");
 		builder.Property(e => e.UserId).HasColumnName("owner_id").IsRequired();
+        builder.Property(e => e.YearStart).HasColumnName("year_start").IsRequired();
 
-		builder.HasMany(e => e.Assignments)
+        builder.HasMany(e => e.Assignments)
 			.WithOne(e => e.Course)
 			.HasForeignKey(e => e.CourseId);
 

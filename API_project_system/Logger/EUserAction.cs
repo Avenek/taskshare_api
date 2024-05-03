@@ -12,5 +12,8 @@
         CreateCourse,
         UpdateCourse,
         DeleteCourse,
+        AddSubmission,
+        UpdateSubmission,
+        DeleteSubmission,
     }
 }

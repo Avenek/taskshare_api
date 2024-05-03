@@ -8,7 +8,7 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
 {
 	public void Configure(EntityTypeBuilder<Assignment> builder)
 	{
-		builder.ToTable("assigments");
+		builder.ToTable("assignments");
 
 		builder.Property(e => e.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
 		builder.Property(e => e.Name).HasColumnName("name").IsRequired();

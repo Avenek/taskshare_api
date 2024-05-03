@@ -13,9 +13,9 @@ namespace API_project_system.Controllers
     {
         private readonly ICourseService courseService;
 
-        public CourseController(ICourseService repositoryService)
+        public CourseController(ICourseService courseService)
         {
-            this.courseService = repositoryService;
+            this.courseService = courseService;
         }
 
         [HttpGet]

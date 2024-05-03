@@ -7,13 +7,11 @@ namespace API_project_system.Middleware
     {
         private readonly ILogger<ErrorHandlingMiddleware> logger;
         private readonly IUnitOfWork unitOfWork;
-        private readonly IUserContextService userContextService;
 
-        public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger, IUnitOfWork unitOfWork, IUserContextService userContextService)
+        public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger, IUnitOfWork unitOfWork)
         {
             this.logger = logger;
             this.unitOfWork = unitOfWork;
-            this.userContextService = userContextService;
         }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
@@ -26,8 +24,6 @@ namespace API_project_system.Middleware
                     {
                         throw new ForbidException("Unauthorized: Token is blacklisted.");
                     }
-                    var userId = userContextService.GetUserId;
-                    unitOfWork.UserId = userId;
                 }
 
                 await next.Invoke(context);

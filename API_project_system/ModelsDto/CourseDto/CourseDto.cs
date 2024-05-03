@@ -1,7 +1,7 @@
 ﻿using API_project_system.Entities;
 using API_project_system.Enums;
 
-namespace API_project_system.ModelsDto.RepositoryDto
+namespace API_project_system.ModelsDto.CourseDto
 {
     public class CourseDto
     {

@@ -6,7 +6,6 @@ namespace API_project_system
 {
     public interface IUnitOfWork
     {
-        int UserId { get; set; }
         IRepository<User> Users { get; }
         IRepository<BlackListedToken> BlackListedTokens { get; }
         IRepository<Role> Roles { get; }
@@ -24,8 +23,6 @@ namespace API_project_system
     public class UnitOfWork : IUnitOfWork
     {
         private readonly SystemDbContext dbContext;
-
-        public int UserId { get; set; }
 
         private IRepository<User> users;
         private Repository<BlackListedToken> blackListedTokens;
