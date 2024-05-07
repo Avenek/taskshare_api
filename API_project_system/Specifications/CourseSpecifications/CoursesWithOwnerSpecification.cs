@@ -15,7 +15,7 @@ namespace API_project_system.Specifications.RepositorySpecification
 
         public override Expression<Func<Course, bool>> ToExpression()
         {
-            return f => (searchPhrase == null || f.Name.Contains(searchPhrase, StringComparison.CurrentCultureIgnoreCase));
+            return f => searchPhrase == null || f.Name.ToLower().Contains(searchPhrase.ToLower());
         }
 
         public override IQueryable<Course> IncludeEntities(IQueryable<Course> queryable)
