@@ -17,7 +17,7 @@ namespace API_project_system.Specifications.CourseSpecifications
 
         public override Expression<Func<CoursePendingUser, bool>> ToExpression()
         {
-            return f => f.UserId == userId && (searchPhrase == null || f.Course.Name.Contains(searchPhrase, StringComparison.CurrentCultureIgnoreCase));
+            return f => f.UserId == userId && (searchPhrase == null || f.Course.Name.ToLower().Contains(searchPhrase.ToLower()));
         }
 
         public override IQueryable<CoursePendingUser> IncludeEntities(IQueryable<CoursePendingUser> queryable)
