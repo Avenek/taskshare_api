@@ -13,10 +13,10 @@ namespace API_project_system.Services
         {
             int resultsToSkip = queryParameters.PageSize * (queryParameters.PageNumber - 1);
             int resultCount = query.Count();
-            var folders = query.Skip(resultsToSkip).Take(queryParameters.PageSize);
-            var foldersDto = folders.Select(f => mapper.Map<T>(f)).ToList();
+            var resultQuery = query.Skip(resultsToSkip).Take(queryParameters.PageSize);
+            var resultDto = resultQuery.Select(f => mapper.Map<T>(f)).ToList();
 
-            var result = new PageResults<T>(foldersDto, resultCount, queryParameters.PageSize, queryParameters.PageNumber);
+            var result = new PageResults<T>(resultDto, resultCount, queryParameters.PageSize, queryParameters.PageNumber);
 
             return result;
         }
