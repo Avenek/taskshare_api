@@ -31,7 +31,8 @@ namespace API_project_system.Database.Configurations
 
 			builder.HasMany(e => e.OwnedCourses)
 				.WithOne(e => e.Owner)
-				.HasForeignKey(e => e.UserId);
+				.HasForeignKey(e => e.UserId)
+				.HasConstraintName("course_ibfk_1");
 
 		}
 	}

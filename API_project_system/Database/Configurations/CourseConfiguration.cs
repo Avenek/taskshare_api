@@ -8,7 +8,10 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 {
 	public void Configure(EntityTypeBuilder<Course> builder)
 	{
-		builder.ToTable("courses");
+        builder.HasKey(e => e.Id).HasName("PRIMARY");
+        builder.HasIndex(e => e.UserId, "course_ibfk_1");
+
+        builder.ToTable("courses");
 
 		builder.Property(e => e.Id).HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
 		builder.Property(e => e.Name).HasColumnName("name").IsRequired();
@@ -44,6 +47,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
         builder.HasOne(a => a.Owner)
 		   .WithMany(c => c.OwnedCourses)
-		   .HasForeignKey(a => a.UserId);
+		   .HasForeignKey(a => a.UserId)
+           .HasConstraintName("course_ibfk_1");
 	}
 }

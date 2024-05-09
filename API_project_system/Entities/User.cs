@@ -1,4 +1,6 @@
-﻿namespace API_project_system.Entities
+﻿using Newtonsoft.Json;
+
+namespace API_project_system.Entities
 {
 	public class User
 	{
@@ -14,8 +16,7 @@
 		public virtual ApprovalStatus Status { get; set; }
 
 		public virtual Role Role { get; set; }
-
-		public virtual ICollection<Course> OwnedCourses { get; set; }
+        public virtual ICollection<Course> OwnedCourses { get; set; } = new List<Course>();
         public virtual ICollection<BlackListedToken> BlackListedTokens { get; set; } = new List<BlackListedToken>();
         public virtual ICollection<UserLog> Logs { get; set; } = new List<UserLog>();
 		public virtual ICollection<Course> EnrolledCourses { get; set; } = new List<Course>();

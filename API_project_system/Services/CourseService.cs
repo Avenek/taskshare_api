@@ -53,7 +53,11 @@ namespace API_project_system.Services
             var spec = new CoursesWithOwnerSpecification(queryParameters.SearchPhrase);
             var courseQuery = UnitOfWork.Courses.GetBySpecification(spec);
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
-            result.Items.Select(f => f.ApprovalStatus = EApprovalStatus.None);
+
+            foreach (var item in result.Items)
+            {
+                item.ApprovalStatus = EApprovalStatus.None;
+            }
 
             return result;
         }
@@ -64,7 +68,10 @@ namespace API_project_system.Services
             var spec = new EnrolledCoursesByUserIdWithOwnerSpecification(userId, queryParameters.SearchPhrase);
             var courseQuery = UnitOfWork.CoursesEnrolledUsers.GetBySpecification(spec).Select(f => f.Course);
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
-            result.Items.Select(f => f.ApprovalStatus = EApprovalStatus.Confirmed);
+            foreach (var item in result.Items)
+            {
+                item.ApprovalStatus = EApprovalStatus.Confirmed;
+            }
 
             return result;
         }
@@ -75,7 +82,10 @@ namespace API_project_system.Services
             var spec = new PendingCoursesByUserIdWithOwnerSpecification(userId, queryParameters.SearchPhrase);
             var courseQuery = UnitOfWork.CoursesPendingUsers.GetBySpecification(spec).Select(f => f.Course);
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
-            result.Items.Select(f => f.ApprovalStatus = EApprovalStatus.NeedsConfirmation);
+            foreach (var item in result.Items)
+            {
+                item.ApprovalStatus = EApprovalStatus.NeedsConfirmation;
+            }
 
             return result;
         }
