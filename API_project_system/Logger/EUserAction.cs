@@ -17,5 +17,8 @@
         DeleteSubmission,
         UploadFile,
         DeleteFile,
+        CreateAssignment,
+        UpdateAssignment,
+        DeleteAssignment,
     }
 }

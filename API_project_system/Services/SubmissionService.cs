@@ -1,24 +1,20 @@
-﻿using API_project_system.Entities;
+﻿using API_project_system.Authorization;
+using API_project_system.Entities;
+using API_project_system.Exceptions;
 using API_project_system.Logger;
-using API_project_system.ModelsDto.CourseDto;
-using API_project_system.ModelsDto;
+using API_project_system.ModelsDto.SubmissionDto;
+using API_project_system.Specifications.AssigmentSpecifications;
+using API_project_system.Specifications.SubmissionSpecifications;
+using API_project_system.Transactions;
+using API_project_system.Transactions.Submissions;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using API_project_system.Exceptions;
-using API_project_system.ModelsDto.SubmissionDto;
-using API_project_system.Transactions.Submissions;
-using API_project_system.Specifications.AssigmentSpecifications;
-using Microsoft.AspNetCore.Http;
-using API_project_system.Authorization;
-using API_project_system.Transactions;
-using API_project_system.Specifications.SubmissionSpecifications;
 
 namespace API_project_system.Services
 {
     public interface ISubmissionService
     {
         public IUnitOfWork UnitOfWork { get; }
-
         public int CreateSubmission(AddSubmissionDto addSubmissionDto);
         public Task UploadFilesToSubmissionAsync(int submissionId, IFormFileCollection filesToUpload);
         public void DeleteSubmission(int submissionId);
@@ -138,7 +134,7 @@ namespace API_project_system.Services
         private string CreateAssignmentDirectoryPath(Assignment assignment) =>
             $"{assignment.Name.Replace(' ', '_')}";
 
-        private string CreateCourseDirectoryPath(Assignment assignment) => 
+        private string CreateCourseDirectoryPath(Assignment assignment) =>
             $"{assignment.Course.Owner.Lastname}_{assignment.Course.Name.Replace(' ', '_')}_{assignment.Course.YearStart}_{assignment.Course.YearStart + 1}";
         private string CreateStudentDirectoryPath(int userId)
         {
@@ -170,7 +166,7 @@ namespace API_project_system.Services
         {
             var userId = userContextService.GetUserId;
             Submission submissionToRemove = GetSubmissionIfBelongsToUser(userId, submissionId);
-            foreach(var file in submissionToRemove.Files)
+            foreach (var file in submissionToRemove.Files)
             {
                 File.Delete(file.FilePath);
 
