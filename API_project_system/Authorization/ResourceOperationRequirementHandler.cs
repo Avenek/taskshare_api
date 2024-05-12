@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace API_project_system.Authorization
 {
-    public class ResourceOperationRequirementHandler : AuthorizationHandler<ResourceOperationRequirement, Course>
+    public class ResourceOperationRequirementHandler : AuthorizationHandler<ResourceOperationRequirement, IHasUserId>
     {
         private readonly IUserContextService userContextService;
 
@@ -12,15 +12,15 @@ namespace API_project_system.Authorization
         {
             this.userContextService = userContextService;
         }
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ResourceOperationRequirement requirement, Course course)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ResourceOperationRequirement requirement, IHasUserId userIdEntity)
         {
-            if(requirement.ResourseOperation == ResourseOperation.Create)
+            if (requirement.ResourseOperation == ResourseOperation.Create)
             {
                 context.Succeed(requirement);
             }
 
             var userId = userContextService.GetUserId;
-            if(course.UserId == userId)
+            if (userIdEntity.UserId == userId)
             {
                 context.Succeed(requirement);
             }

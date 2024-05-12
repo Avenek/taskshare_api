@@ -1,19 +1,9 @@
 using API_project_system;
 using API_project_system.DbContexts;
-using API_project_system.Entities;
-using API_project_system.MappingProfiles;
 using API_project_system.Middleware;
-using API_project_system.ModelsDto;
-using API_project_system.ModelsDto.Validators;
 using API_project_system.Registrars;
-using API_project_system.Repositories;
 using API_project_system.Seeders;
-using API_project_system.Services;
-using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -72,7 +62,34 @@ builder.Services.AddCors(options =>
     );
 });
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Enter 'Bearer {token}'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -91,7 +108,11 @@ app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
-
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+});
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
