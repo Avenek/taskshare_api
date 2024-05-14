@@ -4,5 +4,6 @@
     {
         public string? Name { get; set; } = null;
         public string? IconPath { get; set; } = null;
+        public int? YearStart { get; set; } = null;
     }
 }

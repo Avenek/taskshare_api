@@ -170,7 +170,7 @@ namespace API_project_system.Services
 
             if (authorizationResult.Succeeded)
             {
-                UpdateCourseTransaction updateCourseTransaction = new(courseToUpdate, updateCourseDto.Name, updateCourseDto.IconPath);
+                UpdateCourseTransaction updateCourseTransaction = new(courseToUpdate, updateCourseDto.Name, updateCourseDto.IconPath, updateCourseDto.YearStart);
                 updateCourseTransaction.Execute();
                 UnitOfWork.Commit();
                 logger.Log(EUserAction.UpdateCourse, userId, DateTime.UtcNow, courseId);
