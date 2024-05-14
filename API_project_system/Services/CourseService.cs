@@ -90,12 +90,27 @@ namespace API_project_system.Services
             return result;
         }
 
+        public PageResults<CourseDto> GetAllOwnedCoursesByUser(GetAllQuery queryParameters)
+        {
+            var userId = userContextService.GetUserId;
+            var spec = new OwnedCoursesByUserIdWithOwnerSpecification(userId, queryParameters.SearchPhrase);
+            var courseQuery = UnitOfWork.Courses.GetBySpecification(spec);
+            var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
+            foreach (var item in result.Items)
+            {
+                item.ApprovalStatus = EApprovalStatus.None;
+            }
+
+            return result;
+        }
+
         public PageResults<CourseDto> GetAllByUser(GetAllQuery queryParameters)
         {
             var resultPending = GetAllPendingByUser(queryParameters);
             var resultEnrolled = GetAllEnrolledByUser(queryParameters);
+            var resultOwned = GetAllOwnedCoursesByUser(queryParameters);
 
-            var concatResult = new PageResults<CourseDto>(resultPending.Items.Concat(resultEnrolled.Items).ToList(), 
+            var concatResult = new PageResults<CourseDto>(resultPending.Items.Concat(resultEnrolled.Items).Concat(resultOwned.Items).ToList(), 
                 resultPending.TotalItemsCount + resultEnrolled.TotalItemsCount,
                 queryParameters.PageSize,
                 queryParameters.PageNumber);
@@ -168,7 +183,8 @@ namespace API_project_system.Services
 
         private Course GetCourseIfUserBelongsTo(int userId, int courseId)
         {
-            var course = UnitOfWork.Courses.GetById(courseId);
+            var spec = new CourseByIdWithOwnerSpecification(courseId);
+            var course = UnitOfWork.Courses.GetBySpecification(spec).FirstOrDefault();
             if (course is null)
             {
                 throw new NotFoundException("That entity doesn't exist.");
