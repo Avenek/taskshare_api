@@ -20,7 +20,7 @@ namespace API_project_system.Specifications.RepositorySpecification
 
         public override IQueryable<Course> IncludeEntities(IQueryable<Course> queryable)
         {
-            return queryable.Include(f => f.Owner);
+            return queryable.Include(f => f.Owner).Include(f => f.EnrolledUsers).Include(f=> f.PendingUsers);
         }
     }
 }

@@ -50,13 +50,33 @@ namespace API_project_system.Services
 
         public PageResults<CourseDto> GetAll(GetAllQuery queryParameters)
         {
+            var userId = userContextService.GetUserId;
             var spec = new CoursesWithOwnerSpecification(queryParameters.SearchPhrase);
             var courseQuery = UnitOfWork.Courses.GetBySpecification(spec);
+            var enrolledUserIds = courseQuery
+                .ToList()
+                .SelectMany(f => f.EnrolledUsers.Select(u => u.Id))
+                .ToList();
+            var pendingUserIds = courseQuery
+                .ToList()
+                .SelectMany(f => f.PendingUsers.Select(u => u.Id))
+                .ToList();
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
 
             foreach (var item in result.Items)
             {
-                item.ApprovalStatus = EApprovalStatus.None;
+                if (enrolledUserIds.Contains(userId))
+                {
+                    item.ApprovalStatus = EApprovalStatus.Confirmed;
+                }
+                else if (pendingUserIds.Contains(userId))
+                {
+                    item.ApprovalStatus = EApprovalStatus.NeedsConfirmation;
+                }
+                else
+                {
+                    item.ApprovalStatus = EApprovalStatus.None;
+                }
             }
 
             return result;
