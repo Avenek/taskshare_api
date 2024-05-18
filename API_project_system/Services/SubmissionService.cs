@@ -20,7 +20,8 @@ namespace API_project_system.Services
         public void DeleteSubmission(int submissionId);
         public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateSubmissionDto);
         void DeleteFileFromSubmission(int fileId);
-        SubmissionDto GetById(int submissionId);
+        public SubmissionDto GetById(int submissionId);
+        public List<SubmissionDto> GetAllByAssignmentId(int assignmentId);
     }
     public class SubmissionService : ISubmissionService
     {
@@ -48,6 +49,22 @@ namespace API_project_system.Services
             var submissionDto = mapper.Map<SubmissionDto>(submission);
 
             return submissionDto;
+        }
+
+        public List<SubmissionDto> GetAllByAssignmentId(int assignmentId)
+        {
+            var userId = userContextService.GetUserId;
+            var spec = new AssignmentByIdWithCourseAndSubmissionsSpecification(assignmentId);
+            var assignment = UnitOfWork.Assignments.GetBySpecification(spec).FirstOrDefault(); ;
+            if (assignment.Course.UserId != userId)
+            {
+                throw new ForbidException("User has no owner access to this course.");
+            }
+
+            List<Submission> submissions = assignment.Submissions.ToList();
+            List<SubmissionDto> submissionDtos = mapper.Map<List<SubmissionDto>>(submissions);
+
+            return submissionDtos;
         }
 
         public int CreateSubmission(AddSubmissionDto addSubmissionDto)

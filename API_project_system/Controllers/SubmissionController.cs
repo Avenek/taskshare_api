@@ -1,6 +1,4 @@
-﻿using API_project_system.ModelsDto;
-using API_project_system.ModelsDto.CourseDto;
-using API_project_system.ModelsDto.SubmissionDto;
+﻿using API_project_system.ModelsDto.SubmissionDto;
 using API_project_system.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +22,13 @@ namespace API_project_system.Controllers
         {
             var submission = submissionService.GetById(submissionId);
             return Ok(submission);
+        }
+        [HttpGet("byassignment/{assignmentId}")]
+        [Authorize(Roles = "Teacher")]
+        public ActionResult GetAllByAssignmentId(int assignmentId)
+        {
+            var submissions = submissionService.GetAllByAssignmentId(assignmentId);
+            return Ok(submissions);
         }
 
         [HttpPost()]
