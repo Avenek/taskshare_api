@@ -4,6 +4,7 @@ using API_project_system.Exceptions;
 using API_project_system.Logger;
 using API_project_system.ModelsDto.AssignmentDto;
 using API_project_system.Specifications.AssigmentSpecifications;
+using API_project_system.Specifications.CourseSpecifications;
 using API_project_system.Transactions;
 using API_project_system.Transactions.Assignments;
 using AutoMapper;
@@ -42,7 +43,7 @@ namespace API_project_system.Services
         {
             if (!(IsOwner(courseId) || IsEnrolled(courseId)))
             {
-                throw new ForbidException("Cannot access this assigment.");
+                throw new ForbidException("User has not access to this course");
             }
             var userId = userContextService.GetUserId;
             var spec = new AssignmentsByCourseIdSpecification(courseId, userId);
@@ -144,8 +145,9 @@ namespace API_project_system.Services
         private bool IsEnrolled(int courseId)
         {
             var userId = userContextService.GetUserId;
-            var enrolledCourses = UnitOfWork.CoursesEnrolledUsers.GetAllByUser(userId);
-            return enrolledCourses.Exists(f => f.CourseId == courseId);
+            var enrolledSpec = new EnrolledCoursesByUserIdWithOwnerSpecification(userId, null);
+            var enrolledCourses = UnitOfWork.CoursesEnrolledUsers.GetBySpecification(enrolledSpec);
+            return enrolledCourses.ToList().Exists(f => f.CourseId == courseId);
         }
     }
 }
