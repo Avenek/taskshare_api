@@ -12,7 +12,10 @@ namespace API_project_system.MappingProfiles
             CreateMap<AddCourseDto, Course>();
             CreateMap<UpdateCourseDto, Course>();
             CreateMap<Course, CourseDto>()
-                        .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner)); 
+                        .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner));
+            CreateMap<Course, CourseMembersDto>()
+                        .ForMember(dest => dest.EnrolledUsers, opt => opt.MapFrom(src => src.EnrolledUsers))
+                        .ForMember(dest => dest.PendingUsers, opt => opt.MapFrom(src => src.PendingUsers));
 
             CreateMap<User, UserDto>();
         }

@@ -5,14 +5,12 @@ using API_project_system.Exceptions;
 using API_project_system.Logger;
 using API_project_system.ModelsDto;
 using API_project_system.ModelsDto.CourseDto;
-using API_project_system.Specifications;
 using API_project_system.Specifications.CourseSpecifications;
 using API_project_system.Specifications.RepositorySpecification;
 using API_project_system.Transactions;
 using API_project_system.Transactions.Courses;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 
 namespace API_project_system.Services
 {
@@ -23,7 +21,11 @@ namespace API_project_system.Services
         public PageResults<CourseDto> GetAllEnrolledByUser(GetAllQuery queryParameters);
         public PageResults<CourseDto> GetAllPendingByUser(GetAllQuery queryParameters);
         public PageResults<CourseDto> GetAllByUser(GetAllQuery queryParameters);
+        public CourseMembersDto GetAllMembersWithStatus(int courseId);
         public CourseDto GetById(int courseId);
+        public void JoinCourse(int courseId);
+        public void AcceptMember(CourseMemberDto courseMemberDto);
+        public void RemoveMember(CourseMemberDto courseMemberDto);
         public Course CreateCourse(AddCourseDto addCourseDto);
         public void DeleteCourse(int courseId);
         public void UpdateCourse(int courseId, UpdateCourseDto updateCourseDto);
@@ -37,7 +39,7 @@ namespace API_project_system.Services
         private readonly IUserContextService userContextService;
         private readonly IAuthorizationService authorizationService;
 
-        public CourseService(IUnitOfWork unitOfWork, IMapper mapper, UserActionLogger logger, 
+        public CourseService(IUnitOfWork unitOfWork, IMapper mapper, UserActionLogger logger,
             IPaginationService queryParametersService, IUserContextService userContextService, IAuthorizationService authorizationService)
         {
             UnitOfWork = unitOfWork;
@@ -130,14 +132,26 @@ namespace API_project_system.Services
             var resultEnrolled = GetAllEnrolledByUser(queryParameters);
             var resultOwned = GetAllOwnedCoursesByUser(queryParameters);
 
-            var concatResult = new PageResults<CourseDto>(resultPending.Items.Concat(resultEnrolled.Items).Concat(resultOwned.Items).ToList(), 
+            var concatResult = new PageResults<CourseDto>(resultPending.Items.Concat(resultEnrolled.Items).Concat(resultOwned.Items).ToList(),
                 resultPending.TotalItemsCount + resultEnrolled.TotalItemsCount,
                 queryParameters.PageSize,
                 queryParameters.PageNumber);
 
             return concatResult;
         }
+        public CourseMembersDto GetAllMembersWithStatus(int courseId)
+        {
+            var userId = userContextService.GetUserId;
+            var spec = new CourseByIdWithUsersSpecification(courseId);
+            var course = UnitOfWork.Courses.GetBySpecification(spec).FirstOrDefault();
+            if (course.UserId != userId)
+            {
+                throw new ForbidException("User has no owner access to this course.");
+            }
+            var courseMembersDto = mapper.Map<CourseMembersDto>(course);
+            return courseMembersDto;
 
+        }
         public CourseDto GetById(int courseId)
         {
             var userId = userContextService.GetUserId;
@@ -145,6 +159,72 @@ namespace API_project_system.Services
             var courseDto = mapper.Map<CourseDto>(course);
             courseDto.ApprovalStatus = EApprovalStatus.Confirmed;
             return courseDto;
+        }
+
+        public void JoinCourse(int courseId)
+        {
+            var userId = userContextService.GetUserId;
+            var spec = new CourseByIdWithUsersSpecification(courseId);
+            var course = UnitOfWork.Courses.GetById(courseId);
+            var pendingSpec = new PendingCoursesByUserIdWithOwnerSpecification(userId, null);
+            var pendingCourses = UnitOfWork.CoursesPendingUsers.GetBySpecification(pendingSpec);
+            if (pendingCourses.ToList().Exists(f => f.CourseId == courseId))
+            {
+                throw new ForbidException("Already pending to course");
+            }
+            var enrolledSpec = new EnrolledCoursesByUserIdWithOwnerSpecification(userId, null);
+            var enrolledCourses = UnitOfWork.CoursesEnrolledUsers.GetBySpecification(enrolledSpec);
+            if (enrolledCourses.ToList().Exists(f => f.CourseId == courseId))
+            {
+                throw new ForbidException("Already joined to course");
+            }
+            var user = UnitOfWork.Users.GetById(userId);
+            var transaction = new JoinCourseTransaction(course, user);
+            transaction.Execute();
+            UnitOfWork.Commit();
+        }
+
+        public void AcceptMember(CourseMemberDto courseMemberDto)
+        {
+            var userId = userContextService.GetUserId;
+            var course = GetCourseIfUserBelongsTo(userId, courseMemberDto.CourseId);
+            if (course.UserId != userId)
+            {
+                throw new ForbidException("User has no owner access to this course.");
+            }
+            var user = UnitOfWork.Users.GetById(courseMemberDto.UserId);
+            var pendingSpec = new PendingCoursesByUserIdWithOwnerSpecification(courseMemberDto.UserId, null);
+            var pendingCourses = UnitOfWork.CoursesPendingUsers.GetBySpecification(pendingSpec);
+            if (!pendingCourses.ToList().Exists(f => f.CourseId == courseMemberDto.CourseId))
+            {
+                throw new NotFoundException("User is not pending to this course.");
+            }
+            var transaction = new AcceptMemberTransaction(course, user);
+            transaction.Execute();
+            UnitOfWork.Commit();
+
+        }
+
+        public void RemoveMember(CourseMemberDto courseMemberDto)
+        {
+            var userId = userContextService.GetUserId;
+            var course = GetCourseIfUserBelongsTo(userId, courseMemberDto.CourseId);
+            if (course.UserId != userId)
+            {
+                throw new ForbidException("User has no owner access to this course.");
+            }
+            var user = UnitOfWork.Users.GetById(courseMemberDto.UserId);
+            var pendingSpec = new PendingCoursesByUserIdWithOwnerSpecification(courseMemberDto.UserId, null);
+            var pendingCourses = UnitOfWork.CoursesPendingUsers.GetBySpecification(pendingSpec);
+            var enrolledSpec = new EnrolledCoursesByUserIdWithOwnerSpecification(courseMemberDto.UserId, null);
+            var enrolledCourses = UnitOfWork.CoursesEnrolledUsers.GetBySpecification(enrolledSpec);
+            if (!pendingCourses.ToList().Exists(f => f.CourseId == courseMemberDto.CourseId) && !enrolledCourses.ToList().Exists(f => f.CourseId == courseMemberDto.CourseId))
+            {
+                throw new NotFoundException("User is not registered to this course.");
+            }
+            var transaction = new RemoveMemberTransaction(course, user);
+            transaction.Execute();
+            UnitOfWork.Commit();
         }
 
         public Course CreateCourse(AddCourseDto addCourseDto)
@@ -164,7 +244,7 @@ namespace API_project_system.Services
             var userId = userContextService.GetUserId;
             Course courseToRemove = GetCourseIfUserBelongsTo(userId, courseId);
 
-            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, courseToRemove, 
+            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, courseToRemove,
                 new ResourceOperationRequirement(ResourseOperation.Delete)).Result;
 
             if (authorizationResult.Succeeded)

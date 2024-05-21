@@ -53,6 +53,40 @@ namespace API_project_system.Controllers
             return Ok(courses);
         }
 
+        [HttpPut("join/{courseId}")]
+        public ActionResult JoinCourse(int courseId)
+        {
+            courseService.JoinCourse(courseId);
+            return Ok();
+
+        }
+
+        [HttpPut("accept")]
+        [Authorize(Roles = "Teacher")]
+        public ActionResult AcceptMember([FromBody] CourseMemberDto acceptMemberDto)
+        {
+            courseService.AcceptMember(acceptMemberDto);
+            return Ok();
+
+        }
+
+        [HttpPut("remove")]
+        [Authorize(Roles = "Teacher")]
+        public ActionResult RemoveMember([FromBody] CourseMemberDto removeMemberDto)
+        {
+            courseService.RemoveMember(removeMemberDto);
+            return Ok();
+
+        }
+
+        [HttpGet("members/{courseId}")]
+        [Authorize(Roles = "Teacher")]
+        public ActionResult GetAllMembersWithStatus(int courseId)
+        {
+            var courseMembersDto = courseService.GetAllMembersWithStatus(courseId);
+            return Ok(courseMembersDto);
+        }
+
         [HttpPost]
         [Authorize(Roles = "Teacher")]
         public ActionResult CreateCourse([FromBody] AddCourseDto courseToAdd)
