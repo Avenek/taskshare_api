@@ -55,23 +55,22 @@ namespace API_project_system.Services
             var userId = userContextService.GetUserId;
             var spec = new CoursesWithOwnerSpecification(queryParameters.SearchPhrase);
             var courseQuery = UnitOfWork.Courses.GetBySpecification(spec);
-            var enrolledUserIds = courseQuery
-                .ToList()
-                .SelectMany(f => f.EnrolledUsers.Select(u => u.Id))
-                .ToList();
+            var enrolledUserIds =  courseQuery
+            .SelectMany(course => course.EnrolledUsers.Select(user => new { course.Id, UserId = user.Id })
+                .GroupBy(x => x.Id)).ToDictionary(g => g.Key, g => g.Select(x => x.UserId).ToList());
             var pendingUserIds = courseQuery
-                .ToList()
-                .SelectMany(f => f.PendingUsers.Select(u => u.Id))
-                .ToList();
+            .SelectMany(course => course.PendingUsers.Select(user => new { course.Id, UserId = user.Id })
+                .GroupBy(x => x.Id))
+            .ToDictionary(g => g.Key, g => g.Select(x => x.UserId).ToList());
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
 
             foreach (var item in result.Items)
             {
-                if (enrolledUserIds.Contains(userId))
+                if (enrolledUserIds[item.Id].Contains(userId))
                 {
                     item.ApprovalStatus = EApprovalStatus.Confirmed;
                 }
-                else if (pendingUserIds.Contains(userId))
+                else if (pendingUserIds[item.Id].Contains(userId))
                 {
                     item.ApprovalStatus = EApprovalStatus.NeedsConfirmation;
                 }
