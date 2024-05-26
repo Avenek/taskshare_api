@@ -9,7 +9,7 @@ namespace API_project_system.ModelsDto.CourseDto
         public string Name { get; set; }
         public string IconPath { get; set; }
         public int YearStart { get; set; }
-        public EApprovalStatus ApprovalStatus { get; set; }
+        public EStatus ApprovalStatus { get; set; }
         public UserDto Owner { get; set; }
     }
 }

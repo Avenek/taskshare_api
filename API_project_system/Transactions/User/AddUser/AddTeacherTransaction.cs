@@ -12,7 +12,7 @@ namespace API_project_system.Transactions.AddUser
 
         public override int MakeApprovalStatus()
         {
-            return (int)EApprovalStatus.NeedsConfirmation;
+            return (int)EStatus.NeedsConfirmation;
         }
     }
 }

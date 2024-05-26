@@ -59,7 +59,7 @@ namespace API_project_system.Seeders
 
         private IEnumerable<ApprovalStatus> GetStatuses()
         {
-            List<ApprovalStatus> statuses = [new ApprovalStatus() { Name = "Confirmed" }, new ApprovalStatus() { Name = "Needs confirmation" }];
+            List<ApprovalStatus> statuses = [new ApprovalStatus() { Name = "Confirmed" }, new ApprovalStatus() { Name = "Needs confirmation" }, new ApprovalStatus() { Name = "Owner" }];
             return statuses;
         }
     }

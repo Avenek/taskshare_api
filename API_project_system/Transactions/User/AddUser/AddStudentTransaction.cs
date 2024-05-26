@@ -13,7 +13,7 @@ namespace API_project_system.Transactions.AddUser
 
         public override int MakeApprovalStatus()
         {
-            return (int)EApprovalStatus.Confirmed;
+            return (int)EStatus.Confirmed;
         }
     }
 }

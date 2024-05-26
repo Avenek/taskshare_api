@@ -69,15 +69,19 @@ namespace API_project_system.Services
             {
                 if (enrolledUserIds.TryGetValue(item.Id, out List<int>? enrolledUsers) && enrolledUsers.Contains(userId))
                 {
-                    item.ApprovalStatus = EApprovalStatus.Confirmed;
+                    item.ApprovalStatus = EStatus.Confirmed;
                 }
                 else if (pendingUserIds.TryGetValue(item.Id, out List<int>? pendingUsers) && pendingUsers.Contains(userId))
                 {
-                    item.ApprovalStatus = EApprovalStatus.NeedsConfirmation;
+                    item.ApprovalStatus = EStatus.NeedsConfirmation;
+                }
+                else if(item.Owner.Id == userId)
+                {
+                    item.ApprovalStatus = EStatus.Owner;
                 }
                 else
                 {
-                    item.ApprovalStatus = EApprovalStatus.None;
+                    item.ApprovalStatus = EStatus.None;
                 }
             }
 
@@ -92,7 +96,7 @@ namespace API_project_system.Services
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
             foreach (var item in result.Items)
             {
-                item.ApprovalStatus = EApprovalStatus.Confirmed;
+                item.ApprovalStatus = EStatus.Confirmed;
             }
 
             return result;
@@ -106,7 +110,7 @@ namespace API_project_system.Services
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
             foreach (var item in result.Items)
             {
-                item.ApprovalStatus = EApprovalStatus.NeedsConfirmation;
+                item.ApprovalStatus = EStatus.NeedsConfirmation;
             }
 
             return result;
@@ -120,7 +124,7 @@ namespace API_project_system.Services
             var result = queryParametersService.PreparePaginationResults<CourseDto, Course>(queryParameters, courseQuery, mapper);
             foreach (var item in result.Items)
             {
-                item.ApprovalStatus = EApprovalStatus.None;
+                item.ApprovalStatus = EStatus.Owner;
             }
 
             return result;
@@ -157,7 +161,7 @@ namespace API_project_system.Services
             var userId = userContextService.GetUserId;
             Course course = GetCourseIfUserBelongsTo(userId, courseId);
             var courseDto = mapper.Map<CourseDto>(course);
-            courseDto.ApprovalStatus = EApprovalStatus.Confirmed;
+            courseDto.ApprovalStatus = EStatus.Confirmed;
             return courseDto;
         }
 
