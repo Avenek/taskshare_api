@@ -39,6 +39,13 @@ namespace API_project_system.Controllers
             return Ok(courses);
         }
 
+        [HttpGet("user/owned")]
+        public ActionResult GetAllOwnedByUser([FromQuery] GetAllQuery queryParameters)
+        {
+            var courses = courseService.GetAllOwnedByUser(queryParameters);
+            return Ok(courses);
+        }
+
         [HttpGet("user")]
         public ActionResult GetAllByUser([FromQuery] GetAllQuery queryParameters)
         {

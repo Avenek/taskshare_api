@@ -20,6 +20,7 @@ namespace API_project_system.Services
         public PageResults<CourseDto> GetAll(GetAllQuery queryParameters);
         public PageResults<CourseDto> GetAllEnrolledByUser(GetAllQuery queryParameters);
         public PageResults<CourseDto> GetAllPendingByUser(GetAllQuery queryParameters);
+        public PageResults<CourseDto> GetAllOwnedByUser(GetAllQuery queryParameters);
         public PageResults<CourseDto> GetAllByUser(GetAllQuery queryParameters);
         public CourseMembersDto GetAllMembersWithStatus(int courseId);
         public CourseDto GetById(int courseId);
@@ -111,7 +112,7 @@ namespace API_project_system.Services
             return result;
         }
 
-        public PageResults<CourseDto> GetAllOwnedCoursesByUser(GetAllQuery queryParameters)
+        public PageResults<CourseDto> GetAllOwnedByUser(GetAllQuery queryParameters)
         {
             var userId = userContextService.GetUserId;
             var spec = new OwnedCoursesByUserIdWithOwnerSpecification(userId, queryParameters.SearchPhrase);
@@ -129,7 +130,7 @@ namespace API_project_system.Services
         {
             var resultPending = GetAllPendingByUser(queryParameters);
             var resultEnrolled = GetAllEnrolledByUser(queryParameters);
-            var resultOwned = GetAllOwnedCoursesByUser(queryParameters);
+            var resultOwned = GetAllOwnedByUser(queryParameters);
 
             var concatResult = new PageResults<CourseDto>(resultPending.Items.Concat(resultEnrolled.Items).Concat(resultOwned.Items).ToList(),
                 resultPending.TotalItemsCount + resultEnrolled.TotalItemsCount,
