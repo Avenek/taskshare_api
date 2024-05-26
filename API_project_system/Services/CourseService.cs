@@ -55,10 +55,10 @@ namespace API_project_system.Services
             var userId = userContextService.GetUserId;
             var spec = new CoursesWithOwnerSpecification(queryParameters.SearchPhrase);
             var courseQuery = UnitOfWork.Courses.GetBySpecification(spec);
-            var enrolledUserIds =  courseQuery
+            var enrolledUserIds =  courseQuery.AsEnumerable()
             .SelectMany(course => course.EnrolledUsers.Select(user => new { course.Id, UserId = user.Id })
                 .GroupBy(x => x.Id)).ToDictionary(g => g.Key, g => g.Select(x => x.UserId).ToList());
-            var pendingUserIds = courseQuery
+            var pendingUserIds = courseQuery.AsEnumerable()
             .SelectMany(course => course.PendingUsers.Select(user => new { course.Id, UserId = user.Id })
                 .GroupBy(x => x.Id))
             .ToDictionary(g => g.Key, g => g.Select(x => x.UserId).ToList());
