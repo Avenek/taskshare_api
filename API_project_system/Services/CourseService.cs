@@ -66,11 +66,11 @@ namespace API_project_system.Services
 
             foreach (var item in result.Items)
             {
-                if (enrolledUserIds[item.Id].Contains(userId))
+                if (enrolledUserIds.TryGetValue(item.Id, out List<int>? enrolledUsers) && enrolledUsers.Contains(userId))
                 {
                     item.ApprovalStatus = EApprovalStatus.Confirmed;
                 }
-                else if (pendingUserIds[item.Id].Contains(userId))
+                else if (pendingUserIds.TryGetValue(item.Id, out List<int>? pendingUsers) && pendingUsers.Contains(userId))
                 {
                     item.ApprovalStatus = EApprovalStatus.NeedsConfirmation;
                 }
