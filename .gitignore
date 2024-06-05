@@ -8,7 +8,9 @@
 *Dockerfile
 *TestResult*
 /API_project_system/bin/*
+/API_project_system/Migrations/*
 /API_project_system/obj/*
 /UnitTests/bin/*
 /UnitTests/obj/*
-
+/API_project_system/student_files/*
+/API_project_system/swagger.json
