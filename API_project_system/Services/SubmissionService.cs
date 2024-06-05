@@ -3,12 +3,14 @@ using API_project_system.Entities;
 using API_project_system.Exceptions;
 using API_project_system.Logger;
 using API_project_system.ModelsDto.SubmissionDto;
+using API_project_system.ModelsDto.SubmissionFileDtos;
 using API_project_system.Specifications.AssigmentSpecifications;
 using API_project_system.Specifications.SubmissionSpecifications;
 using API_project_system.Transactions;
 using API_project_system.Transactions.Submissions;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace API_project_system.Services
 {
@@ -22,7 +24,7 @@ namespace API_project_system.Services
         void DeleteFileFromSubmission(int fileId);
         public SubmissionDto GetById(int submissionId);
         public List<SubmissionDto> GetAllByAssignmentId(int assignmentId);
-        public Task<byte[]> GetFileFromSubmission(int submissionId, int fileId);
+        public Task<FileDto> GetFileFromSubmission(int submissionId, int fileId);
     }
     public class SubmissionService : ISubmissionService
     {
@@ -88,7 +90,7 @@ namespace API_project_system.Services
 
             if (authorizationResult.Succeeded)
             {
-                if(!AlreadySubmitted(addSubmissionDto.AssignmentId, userId))
+                if (AlreadySubmitted(addSubmissionDto.AssignmentId, userId))
                 {
                     throw new BadRequestException("Assignment is already submitted.");
                 }
@@ -150,7 +152,7 @@ namespace API_project_system.Services
                         UnitOfWork.Commit();
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
-                            await file.CopyToAsync(stream);
+                            file.CopyTo(stream);
                         }
                         logger.Log(EUserAction.UploadFile, userId, DateTime.UtcNow, uploadSubmissionFileTransaction.FileToAdd.Id);
                     }
@@ -197,24 +199,31 @@ namespace API_project_system.Services
             logger.Log(EUserAction.DeleteFile, userId, DateTime.UtcNow, fileId);
         }
 
-        public async Task<byte[]> GetFileFromSubmission(int submissionId, int fileId)
+        public async Task<FileDto> GetFileFromSubmission(int submissionId, int fileId)
         {
             var userId = userContextService.GetUserId;
             var spec = new SubmissionFileByIdWithAssignemnt(fileId);
             var submissionFile = UnitOfWork.SubmissionFiles.GetBySpecification(spec).FirstOrDefault();
 
-            if(submissionFile == null)
+            if (submissionFile == null)
             {
                 throw new BadRequestException("That file doesn't exist");
             }
-            if(submissionFile.Submission.Assignment.UserId != userId && submissionFile.Submission.UserId != userId)
+            if (submissionFile.Submission.Assignment.UserId != userId && submissionFile.Submission.UserId != userId)
             {
                 throw new BadRequestException("Cannot access this file");
             }
 
             var file = await File.ReadAllBytesAsync(submissionFile.FilePath);
 
-            return file;
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(submissionFile.FilePath, out string contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+            FileDto fileDto = new FileDto { Content = file, ContentType = contentType };
+
+            return fileDto;
         }
 
         public void DeleteSubmission(int submissionId)
@@ -268,7 +277,7 @@ namespace API_project_system.Services
             }
             if (submission.UserId != userId)
             {
-                throw new ForbidException("Cannot access to this file.");
+                throw new ForbidException("Cannot access to this submission.");
             }
 
             return submission;

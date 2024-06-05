@@ -59,7 +59,8 @@ namespace API_project_system.Controllers
         public async Task<ActionResult> GetFileFromSubmission(int submissionId, int fileId)
         {
             var file = await submissionService.GetFileFromSubmission(submissionId, fileId);
-            return File(file, "file");
+
+            return File(file.Content, file.ContentType);
         }
 
         [HttpDelete("{submissionId}")]

@@ -7,5 +7,6 @@ namespace API_project_system.ModelsDto.AssignmentDto
         public bool Visibility { get; set; }
         public DateTime DeadlineDate { get; set; }
         public string Description { get; set; }
+
     }
 }
