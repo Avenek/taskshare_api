@@ -24,9 +24,6 @@ namespace API_project_system.Specifications.SubmissionSpecifications
                 .Include(f => f.Submission)
                     .ThenInclude(f => f.Assignment)
                     .ThenInclude(f => f.Course)
-                .Include(f => f.Submission)
-                    .ThenInclude(f => f.Assignment)
-                    .ThenInclude(f => f.Course)
                     .ThenInclude(f => f.EnrolledUsers);
         }
     }
