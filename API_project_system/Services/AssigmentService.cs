@@ -2,9 +2,11 @@ using API_project_system.Authorization;
 using API_project_system.Entities;
 using API_project_system.Exceptions;
 using API_project_system.Logger;
+using API_project_system.ModelsDto.AssigmentDto;
 using API_project_system.ModelsDto.AssignmentDto;
 using API_project_system.Specifications.AssigmentSpecifications;
 using API_project_system.Specifications.CourseSpecifications;
+using API_project_system.Specifications.SubmissionSpecifications;
 using API_project_system.Transactions;
 using API_project_system.Transactions.Assignments;
 using AutoMapper;
@@ -16,7 +18,7 @@ namespace API_project_system.Services
     {
         public IUnitOfWork UnitOfWork { get; }
         public List<AssignmentDto> GetAllByCourseId(int courseId);
-        public AssignmentDto GetById(int assignmentId);
+        public AssignmentWithSubmissionsDto GetById(int assignmentId);
         public AssignmentDto CreateAssignment(AddAssignmentDto assignment);
         public void DeleteAssignment(int assignmentId);
         public void UpdateAssignment(int assignmentId, UpdateAssignmentDto updateAssignmentDto);
@@ -53,10 +55,18 @@ namespace API_project_system.Services
             return assignmentDtos;
 
         }
-        public AssignmentDto GetById(int assigmentId)
+        public AssignmentWithSubmissionsDto GetById(int assigmentId)
         {
+            var userId = userContextService.GetUserId;
             var assignment = GetAssignmentIfUserBelongsTo(assigmentId);
-            var assignmentDto = mapper.Map<AssignmentDto>(assignment);
+
+            var spec = new GetSubmissionByUserAndAssignmentId(assigmentId, userId);
+            var submission = UnitOfWork.Submissions.GetBySpecification(spec).FirstOrDefault();
+            var assignmentDto = mapper.Map<AssignmentWithSubmissionsDto>(assignment);
+            if (submission != null)
+            {
+                assignmentDto.submissionId = submission.Id;
+            }
             return assignmentDto;
         }
 

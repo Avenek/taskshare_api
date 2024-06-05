@@ -23,6 +23,7 @@ namespace API_project_system.Controllers
             var submission = submissionService.GetById(submissionId);
             return Ok(submission);
         }
+
         [HttpGet("byassignment/{assignmentId}")]
         [Authorize(Roles = "Teacher")]
         public ActionResult GetAllByAssignmentId(int assignmentId)
@@ -51,6 +52,15 @@ namespace API_project_system.Controllers
         {
             submissionService.DeleteFileFromSubmission(fileId);
             return NoContent();
+        }
+
+
+        [HttpGet("{submissionId}/file/{fileId}")]
+        public async Task<ActionResult> GetFileFromSubmission(int submissionId, int fileId)
+        {
+            var file = await submissionService.GetFileFromSubmission(submissionId, fileId);
+
+            return File(file.Content, file.ContentType);
         }
 
         [HttpDelete("{submissionId}")]
