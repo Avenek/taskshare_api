@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using API_project_system.Specifications;
+using Microsoft.EntityFrameworkCore;
 
 namespace API_project_system.Repositories
 {
@@ -6,9 +7,10 @@ namespace API_project_system.Repositories
     {
         DbSet<TEntity> Entity { get; }
         void Add(TEntity entity);
-        void AddRange(IEnumerable<TEntity> entities);
         void Remove(int id);
         TEntity GetById(int id);
         List<TEntity> GetAll();
+        List<TEntity> GetAllByUser(int userId);
+        IQueryable<TEntity> GetBySpecification(Specification<TEntity> spec);
     }
 }

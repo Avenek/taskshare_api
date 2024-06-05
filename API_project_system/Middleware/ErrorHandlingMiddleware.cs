@@ -1,23 +1,37 @@
-﻿
-using API_project_system.Exceptions;
+﻿using API_project_system.Exceptions;
 
 namespace API_project_system.Middleware
 {
     public class ErrorHandlingMiddleware : IMiddleware
     {
         private readonly ILogger<ErrorHandlingMiddleware> logger;
+        private readonly IUnitOfWork unitOfWork;
 
-        public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger)
+        public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger, IUnitOfWork unitOfWork)
         {
             this.logger = logger;
+            this.unitOfWork = unitOfWork;
         }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             try
             {
+                var jwtToken = context.Request.Headers["Authorization"].ToString()?.Split(" ").LastOrDefault();
+                if (!string.IsNullOrEmpty(jwtToken) &&
+                    unitOfWork.BlackListedTokens.Entity.Any(token => token.Token.Equals(jwtToken)))
+                {
+                    throw new ForbidException("Unauthorized: Token is blacklisted.");
+                }
+
                 await next.Invoke(context);
             }
-            catch(NotFoundException e)
+            catch (ForbidException e)
+            {
+                logger.LogError(e, e.Message);
+                context.Response.StatusCode = 403;
+                await context.Response.WriteAsync(e.Message);
+            }
+            catch (NotFoundException e)
             {
                 logger.LogError(e, e.Message);
                 context.Response.StatusCode = 404;

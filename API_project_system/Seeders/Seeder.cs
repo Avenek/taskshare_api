@@ -1,18 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using API_project_system.DbContexts;
 using API_project_system.Entities;
-using System.Security.Cryptography;
+using API_project_system.Logger;
 
 namespace API_project_system.Seeders
 {
     public class Seeder
     {
         private readonly SystemDbContext dbContext;
+        private readonly IUnitOfWork unitOfWork;
 
-        public Seeder(SystemDbContext dbContext)
+        public Seeder(SystemDbContext dbContext, IUnitOfWork unitOfWork)
         {
             this.dbContext = dbContext;
+            this.unitOfWork = unitOfWork;
         }
         public void Seed()
         {
@@ -27,14 +28,25 @@ namespace API_project_system.Seeders
                 if(!dbContext.Roles.Any())
                 {
                     var roles = GetRoles();
-                    dbContext.Roles.AddRange(roles);
-                    dbContext.SaveChanges();
+                    unitOfWork.Roles.Entity.AddRange(roles);
+                    unitOfWork.Commit();
                 }
                 if (!dbContext.ApprovalStatuses.Any())
                 {
                     var statuses = GetStatuses();
-                    dbContext.ApprovalStatuses.AddRange(statuses);
-                    dbContext.SaveChanges();
+                    unitOfWork.ApprovalStatuses.Entity.AddRange(statuses);
+                    unitOfWork.Commit();
+                }
+                if (!unitOfWork.UserActions.Entity.Any())
+                {
+                    EUserAction[] userActions = (EUserAction[])Enum.GetValues(typeof(EUserAction));
+
+                    foreach (var action in userActions)
+                    {
+                        if ((int)action > 0) unitOfWork.UserActions.Add(new UserAction() { Id = (int)action, Name = action.ToString() });
+                    }
+                    unitOfWork.Commit();
+
                 }
             }
         }
@@ -47,7 +59,7 @@ namespace API_project_system.Seeders
 
         private IEnumerable<ApprovalStatus> GetStatuses()
         {
-            List<ApprovalStatus> statuses = [new ApprovalStatus() { Name = "Confirmed" }, new ApprovalStatus() { Name = "Needs confirmation" }];
+            List<ApprovalStatus> statuses = [new ApprovalStatus() { Name = "Confirmed" }, new ApprovalStatus() { Name = "Needs confirmation" }, new ApprovalStatus() { Name = "Owner" }];
             return statuses;
         }
     }
