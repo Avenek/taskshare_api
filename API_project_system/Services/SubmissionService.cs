@@ -275,7 +275,7 @@ namespace API_project_system.Services
             {
                 throw new NotFoundException("That entity doesn't exist.");
             }
-            if (submission.UserId != userId)
+            if (submission.UserId != userId && submission.Assignment.UserId != userId)
             {
                 throw new ForbidException("Cannot access to this submission.");
             }

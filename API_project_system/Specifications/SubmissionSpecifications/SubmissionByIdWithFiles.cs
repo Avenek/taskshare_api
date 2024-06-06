@@ -20,7 +20,7 @@ namespace API_project_system.Specifications.SubmissionSpecifications
 
         public override IQueryable<Submission> IncludeEntities(IQueryable<Submission> queryable)
         {
-            return queryable.Include(f => f.Files).Include(f => f.User);
+            return queryable.Include(f => f.Assignment).Include(f => f.Files).Include(f => f.User);
         }
     }
 }
