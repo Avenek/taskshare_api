@@ -26,7 +26,8 @@ namespace API_project_system.Specifications.AssigmentSpecifications
                 .Include(f => f.Course)
                     .ThenInclude(f => f.Owner)
                 .Include(f => f.Course)
-                    .ThenInclude(f => f.EnrolledUsers);
+                    .ThenInclude(f => f.EnrolledUsers)
+                .Include(f=> f.Submissions);
         }
     }
 

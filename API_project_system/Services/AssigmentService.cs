@@ -52,6 +52,10 @@ namespace API_project_system.Services
 
             var assignments = UnitOfWork.Assignments.GetBySpecification(spec);
             var assignmentDtos = mapper.Map<List<AssignmentDto>>(assignments);
+            foreach(var assignment in assignmentDtos)
+            {
+                assignment.isSubmitted = UnitOfWork.Submissions.GetBySpecification(new GetSubmissionByUserAndAssignmentId(assignment.Id, userId)).Any();
+            }
             return assignmentDtos;
 
         }
