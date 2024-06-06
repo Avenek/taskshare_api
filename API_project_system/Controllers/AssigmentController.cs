@@ -29,6 +29,7 @@ namespace API_project_system.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult CreateAssignment([FromBody] AddAssignmentDto assignmentToAdd)
         {
             var assignment = assignmentService.CreateAssignment(assignmentToAdd);
@@ -37,6 +38,7 @@ namespace API_project_system.Controllers
 
         [HttpDelete("{assignmentId}")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult DeleteAssignment(int assignmentId)
         {
             assignmentService.DeleteAssignment(assignmentId);
@@ -45,6 +47,7 @@ namespace API_project_system.Controllers
 
         [HttpPut("{assignmentId}")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult UpdateAssignment(int assignmentId, [FromBody] UpdateAssignmentDto updateAssignmentDto)
         {
             assignmentService.UpdateAssignment(assignmentId, updateAssignmentDto);

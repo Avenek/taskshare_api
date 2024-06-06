@@ -6,7 +6,7 @@ namespace API_project_system.ModelsDto.SubmissionDto
     public class SubmissionDto
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public UserDto User { get; set; }
         public DateTime SubmissionDateTime { get; set; }
         public DateTime LastEdit { get; set; }
         public string StudentComment { get; set; }

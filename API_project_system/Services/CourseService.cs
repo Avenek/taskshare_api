@@ -167,6 +167,10 @@ namespace API_project_system.Services
 
         public void JoinCourse(int courseId)
         {
+            if (userContextService.User.IsInRole("Teacher"))
+            {
+                throw new BadRequestException("Teacher cannot join course.");
+            }
             var userId = userContextService.GetUserId;
             var spec = new CourseByIdWithUsersSpecification(courseId);
             var course = UnitOfWork.Courses.GetById(courseId);

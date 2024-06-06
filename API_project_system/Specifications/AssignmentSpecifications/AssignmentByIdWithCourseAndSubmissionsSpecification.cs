@@ -20,6 +20,7 @@ public class AssignmentByIdWithCourseAndSubmissionsSpecification : Specification
 
     public override IQueryable<Assignment> IncludeEntities(IQueryable<Assignment> queryable)
     {
-        return queryable.Include(f => f.Course).Include(f => f.Submissions).ThenInclude(f => f.Files);
+        return queryable.Include(f => f.Course).Include(f => f.Submissions).ThenInclude(f => f.Files)
+            .Include(f => f.Submissions).ThenInclude(f => f.User);
     }
 }

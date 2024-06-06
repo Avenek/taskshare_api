@@ -26,6 +26,7 @@ namespace API_project_system.Controllers
 
         [HttpGet("byassignment/{assignmentId}")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult GetAllByAssignmentId(int assignmentId)
         {
             var submissions = submissionService.GetAllByAssignmentId(assignmentId);

@@ -34,6 +34,11 @@ builder.Services.AddAuthentication(option =>
     };
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsConfirmed", builder => builder.RequireClaim("Status", "1"));
+});
+
 builder.Services.AddControllers().AddFluentValidation();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
