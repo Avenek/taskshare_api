@@ -40,6 +40,8 @@ namespace API_project_system.Controllers
         }
 
         [HttpGet("user/owned")]
+        [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult GetAllOwnedByUser([FromQuery] GetAllQuery queryParameters)
         {
             var courses = courseService.GetAllOwnedByUser(queryParameters);
@@ -61,6 +63,7 @@ namespace API_project_system.Controllers
         }
 
         [HttpPut("join/{courseId}")]
+        [Authorize(Roles = "Student")]
         public ActionResult JoinCourse(int courseId)
         {
             courseService.JoinCourse(courseId);
@@ -70,6 +73,7 @@ namespace API_project_system.Controllers
 
         [HttpPut("accept")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult AcceptMember([FromBody] CourseMemberDto acceptMemberDto)
         {
             courseService.AcceptMember(acceptMemberDto);
@@ -79,6 +83,7 @@ namespace API_project_system.Controllers
 
         [HttpPut("remove")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult RemoveMember([FromBody] CourseMemberDto removeMemberDto)
         {
             courseService.RemoveMember(removeMemberDto);
@@ -88,6 +93,7 @@ namespace API_project_system.Controllers
 
         [HttpGet("members/{courseId}")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult GetAllMembersWithStatus(int courseId)
         {
             var courseMembersDto = courseService.GetAllMembersWithStatus(courseId);
@@ -96,6 +102,7 @@ namespace API_project_system.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult CreateCourse([FromBody] AddCourseDto courseToAdd)
         {
             var course = courseService.CreateCourse(courseToAdd);
@@ -105,6 +112,7 @@ namespace API_project_system.Controllers
 
         [HttpDelete("{courseId}")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult DeleteCourse(int courseId)
         {
             courseService.DeleteCourse(courseId);
@@ -114,6 +122,7 @@ namespace API_project_system.Controllers
 
         [HttpPut("{courseId}")]
         [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult UpdateCourse(int courseId, [FromBody] UpdateCourseDto updateCoursedto)
         {
             courseService.UpdateCourse(courseId, updateCoursedto);
