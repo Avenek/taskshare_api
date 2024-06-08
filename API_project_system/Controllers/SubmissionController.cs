@@ -40,30 +40,6 @@ namespace API_project_system.Controllers
             return Created($"api/submission/{submissionId}", submissionId);
         }
 
-        [HttpPost("{submissionId}/files")]
-        public ActionResult UploadFilesToSubmission(int submissionId)
-        {
-            var files = Request.Form.Files;
-            submissionService.UploadFilesToSubmissionAsync(submissionId, files);
-            return Ok();
-        }
-
-        [HttpDelete("{submissionId}/file/{fileId}")]
-        public ActionResult DeleteFileFromSubmission(int submissionId, int fileId)
-        {
-            submissionService.DeleteFileFromSubmission(fileId);
-            return NoContent();
-        }
-
-
-        [HttpGet("{submissionId}/file/{fileId}")]
-        public async Task<ActionResult> GetFileFromSubmission(int submissionId, int fileId)
-        {
-            var file = await submissionService.GetFileFromSubmission(submissionId, fileId);
-
-            return File(file.Content, file.ContentType);
-        }
-
         [HttpDelete("{submissionId}")]
         public ActionResult DeleteSubmission(int submissionId)
         {

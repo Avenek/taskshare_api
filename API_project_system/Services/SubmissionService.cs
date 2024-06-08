@@ -18,17 +18,13 @@ namespace API_project_system.Services
     {
         public IUnitOfWork UnitOfWork { get; }
         public int CreateSubmission(AddSubmissionDto addSubmissionDto);
-        public Task UploadFilesToSubmissionAsync(int submissionId, IFormFileCollection filesToUpload);
         public void DeleteSubmission(int submissionId);
         public void UpdateSubmission(int submissionId, UpdateSubmissionDto updateSubmissionDto);
-        void DeleteFileFromSubmission(int fileId);
         public SubmissionDto GetById(int submissionId);
         public List<SubmissionDto> GetAllByAssignmentId(int assignmentId);
-        public Task<FileDto> GetFileFromSubmission(int submissionId, int fileId);
     }
     public class SubmissionService : ISubmissionService
     {
-        const string STUDENT_FILES_PATH = "student_files";
         public IUnitOfWork UnitOfWork { get; }
         private readonly IMapper mapper;
         private readonly UserActionLogger logger;
@@ -117,115 +113,6 @@ namespace API_project_system.Services
             return userSubmission != null;
         }
 
-        public async Task UploadFilesToSubmissionAsync(int submissionId, IFormFileCollection filesToUpload)
-        {
-            var userId = userContextService.GetUserId;
-            Submission submission = UnitOfWork.Submissions.GetById(submissionId);
-
-            var spec = new AssignmentByIdWithCourseAndOwnerAndEnrolledUsersSpecification(submission.AssignmentId);
-            Assignment assignment = UnitOfWork.Assignments.GetBySpecification(spec).FirstOrDefault();
-            if (assignment == null)
-            {
-                throw new BadRequestException("Wrong assignment id.");
-            }
-            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, assignment.Course,
-                new UserEnrolledToCourseRequirement()).Result;
-
-            if (authorizationResult.Succeeded)
-            {
-                string pathToUpload = CreatePathToUpload(assignment, userId);
-
-                if (!Directory.Exists(pathToUpload))
-                {
-                    Directory.CreateDirectory(pathToUpload);
-                }
-
-                foreach (var file in filesToUpload)
-                {
-                    if (file.Length > 0)
-                    {
-                        var fileName = Path.GetFileName(file.FileName);
-                        var filePath = Path.Combine(pathToUpload, fileName);
-
-                        UploadSubmissionFileTransaction uploadSubmissionFileTransaction = new UploadSubmissionFileTransaction(UnitOfWork, submissionId, filePath);
-                        uploadSubmissionFileTransaction.Execute();
-                        UnitOfWork.Commit();
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            file.CopyTo(stream);
-                        }
-                        logger.Log(EUserAction.UploadFile, userId, DateTime.UtcNow, uploadSubmissionFileTransaction.FileToAdd.Id);
-                    }
-                    else
-                    {
-                        throw new BadRequestException("Empty file.");
-                    }
-                }
-            }
-            else
-            {
-                throw new BadRequestException("User has no acces to this course.");
-            }
-        }
-
-        private string CreateAssignmentDirectoryPath(Assignment assignment) =>
-            $"{assignment.Name.Replace(' ', '_')}";
-
-        private string CreateCourseDirectoryPath(Assignment assignment) =>
-            $"{assignment.Course.Owner.Lastname}_{assignment.Course.Name.Replace(' ', '_')}_{assignment.Course.YearStart}_{assignment.Course.YearStart + 1}";
-        private string CreateStudentDirectoryPath(int userId)
-        {
-            User student = UnitOfWork.Users.GetById(userId);
-            return $"{student.Lastname}_{student.Name}";
-        }
-
-        private string CreatePathToUpload(Assignment assignment, int userId)
-        {
-            string courseDirectoryPath = CreateCourseDirectoryPath(assignment);
-            string studentDirectoryPath = CreateStudentDirectoryPath(userId);
-            string assignmetDirectoryPath = CreateAssignmentDirectoryPath(assignment);
-            return Path.Combine(STUDENT_FILES_PATH, courseDirectoryPath, studentDirectoryPath, assignmetDirectoryPath);
-        }
-
-        public void DeleteFileFromSubmission(int fileId)
-        {
-            var userId = userContextService.GetUserId;
-            SubmissionFile fileToRemove = GetFileIfBelongsToUser(userId, fileId);
-
-            DeleteEntityTransaction<SubmissionFile> deleteCourseTransaction = new(UnitOfWork.SubmissionFiles, fileToRemove.Id);
-            deleteCourseTransaction.Execute();
-            UnitOfWork.Commit();
-            File.Delete(fileToRemove.FilePath);
-            logger.Log(EUserAction.DeleteFile, userId, DateTime.UtcNow, fileId);
-        }
-
-        public async Task<FileDto> GetFileFromSubmission(int submissionId, int fileId)
-        {
-            var userId = userContextService.GetUserId;
-            var spec = new SubmissionFileByIdWithAssignemnt(fileId);
-            var submissionFile = UnitOfWork.SubmissionFiles.GetBySpecification(spec).FirstOrDefault();
-
-            if (submissionFile == null)
-            {
-                throw new BadRequestException("That file doesn't exist");
-            }
-            if (submissionFile.Submission.Assignment.UserId != userId && submissionFile.Submission.UserId != userId)
-            {
-                throw new BadRequestException("Cannot access this file");
-            }
-
-            var file = await File.ReadAllBytesAsync(submissionFile.FilePath);
-
-            var provider = new FileExtensionContentTypeProvider();
-            if (!provider.TryGetContentType(submissionFile.FilePath, out string contentType))
-            {
-                contentType = "application/octet-stream";
-            }
-            FileDto fileDto = new FileDto { Content = file, ContentType = contentType };
-
-            return fileDto;
-        }
-
         public void DeleteSubmission(int submissionId)
         {
             var userId = userContextService.GetUserId;
@@ -249,22 +136,6 @@ namespace API_project_system.Services
             updateSubmissionTransaction.Execute();
             UnitOfWork.Commit();
             logger.Log(EUserAction.UpdateSubmission, userId, DateTime.UtcNow, submissionId);
-        }
-
-        private SubmissionFile GetFileIfBelongsToUser(int userId, int fileId)
-        {
-            var spec = new SubmissionFileByIdWithAssignemnt(fileId);
-            SubmissionFile submissionFile = UnitOfWork.SubmissionFiles.GetBySpecification(spec).FirstOrDefault();
-            if (submissionFile is null)
-            {
-                throw new NotFoundException("That entity doesn't exist.");
-            }
-            if (submissionFile.Submission.UserId != userId)
-            {
-                throw new ForbidException("Cannot access to this file.");
-            }
-
-            return submissionFile;
         }
 
         private Submission GetSubmissionIfBelongsToUser(int userId, int submissionId)
