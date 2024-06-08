@@ -40,6 +40,8 @@ namespace API_project_system.Controllers
         }
 
         [HttpGet("user/owned")]
+        [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult GetAllOwnedByUser([FromQuery] GetAllQuery queryParameters)
         {
             var courses = courseService.GetAllOwnedByUser(queryParameters);
@@ -61,6 +63,7 @@ namespace API_project_system.Controllers
         }
 
         [HttpPut("join/{courseId}")]
+        [Authorize(Roles = "Student")]
         public ActionResult JoinCourse(int courseId)
         {
             courseService.JoinCourse(courseId);

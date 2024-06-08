@@ -24,7 +24,7 @@ namespace API_project_system.Services
         public void UpdateAssignment(int assignmentId, UpdateAssignmentDto updateAssignmentDto);
     }
 
-    public class AssigmentService : IAssignmentService
+    public class AssignmentService : IAssignmentService
     {
         public IUnitOfWork UnitOfWork { get; }
         private readonly IMapper mapper;
@@ -32,7 +32,7 @@ namespace API_project_system.Services
         private readonly IUserContextService userContextService;
         private readonly IAuthorizationService authorizationService;
 
-        public AssigmentService(IUnitOfWork unitOfWork, IMapper mapper, UserActionLogger logger,
+        public AssignmentService(IUnitOfWork unitOfWork, IMapper mapper, UserActionLogger logger,
             IUserContextService userContextService, IAuthorizationService authorizationService)
         {
             UnitOfWork = unitOfWork;

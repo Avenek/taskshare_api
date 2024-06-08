@@ -26,7 +26,6 @@ namespace API_project_system.Controllers
         }
 
         [HttpGet("{userId}")]
-
         public ActionResult GetById(int userId)
         {
             var user = userService.GetById(userId);
