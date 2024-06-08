@@ -5,6 +5,7 @@ using API_project_system.Logger;
 using API_project_system.ModelsDto.SubmissionDto;
 using API_project_system.ModelsDto.SubmissionFileDtos;
 using API_project_system.Specifications.AssigmentSpecifications;
+using API_project_system.Specifications.CourseSpecifications;
 using API_project_system.Specifications.SubmissionSpecifications;
 using API_project_system.Transactions;
 using API_project_system.Transactions.Submissions;
@@ -173,57 +174,88 @@ namespace API_project_system.Services
 
         public MemoryStream GetFilesFromAssignment(int assignmentId)
         {
-            using (var memoryStream = new MemoryStream())
+            var spec = new AssignmentByIdWithCourseAndOwnerAndEnrolledUsersSpecification(assignmentId);
+            Assignment assignment = UnitOfWork.Assignments.GetBySpecification(spec).FirstOrDefault();
+            if (assignment == null)
             {
-                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                {
-                    var spec = new AssignmentByIdWithCourseAndOwnerAndEnrolledUsersSpecification(assignmentId);
-                    Assignment assignment = UnitOfWork.Assignments.GetBySpecification(spec).FirstOrDefault();
-                    if (assignment == null)
-                    {
-                        throw new BadRequestException("Wrong assignment id.");
-                    }
-                    foreach (var user in assignment.Course.EnrolledUsers) 
-                    {
-                        string path = CreatePathToUpload(assignment, user.Id);
-                        AddFolderToZip(archive, path, string.Empty);
-                    }
+                throw new BadRequestException("Wrong assignment id.");
+            }
+            var course = UnitOfWork.Courses.GetById(assignment.CourseId);
+            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, course,
+                new ResourceOperationRequirement(ResourseOperation.Update)).Result;
 
+            if (authorizationResult.Succeeded)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                    {
+                        foreach (var user in assignment.Course.EnrolledUsers)
+                        {
+                            string path = CreatePathToUpload(assignment, user.Id);
+                            AddFolderToZip(archive, path, string.Empty);
+                        }
+
+                    }
+                    memoryStream.Position = 0;
+                    return memoryStream;
                 }
-                memoryStream.Position = 0;
-                return memoryStream;
+            }
+            else
+            {
+                throw new ForbidException("Cannot download files from this course.");
             }
         }
 
         public MemoryStream GetFilesFromUser(int courseId, int userId)
         {
-            using (var memoryStream = new MemoryStream())
+            var course = UnitOfWork.Courses.GetById(courseId);
+            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, course,
+                new ResourceOperationRequirement(ResourseOperation.Update)).Result;
+
+            if (authorizationResult.Succeeded)
             {
-                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                using (var memoryStream = new MemoryStream())
                 {
-                    var course = UnitOfWork.Courses.GetById(courseId);
-                    string courseDirectoryPath = CreateCourseDirectoryPath(course);
-                    string studentDirectoryPath = CreateStudentDirectoryPath(userId);
-                    string path = Path.Combine(courseDirectoryPath, courseDirectoryPath);
-                    AddFolderToZip(archive, path, string.Empty);
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                    {
+                        string courseDirectoryPath = CreateCourseDirectoryPath(course);
+                        string studentDirectoryPath = CreateStudentDirectoryPath(userId);
+                        string path = Path.Combine(courseDirectoryPath, courseDirectoryPath);
+                        AddFolderToZip(archive, path, string.Empty);
+                    }
+                    memoryStream.Position = 0;
+                    return memoryStream;
                 }
-                memoryStream.Position = 0;
-                return memoryStream;
+            }
+            else
+            {
+                throw new ForbidException("Cannot download files from this course.");
             }
         }
 
         public MemoryStream GetFilesFromCourse(int courseId)
         {
-            using (var memoryStream = new MemoryStream())
+            var course = UnitOfWork.Courses.GetById(courseId);
+            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, course,
+                new ResourceOperationRequirement(ResourseOperation.Update)).Result;
+
+            if (authorizationResult.Succeeded)
             {
-                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                using (var memoryStream = new MemoryStream())
                 {
-                    var course = UnitOfWork.Courses.GetById(courseId);
-                    string courseDirectoryPath = CreateCourseDirectoryPath(course);
-                    AddFolderToZip(archive, courseDirectoryPath, string.Empty);
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                    {
+                        string courseDirectoryPath = CreateCourseDirectoryPath(course);
+                        AddFolderToZip(archive, courseDirectoryPath, string.Empty);
+                    }
+                    memoryStream.Position = 0;
+                    return memoryStream;
                 }
-                memoryStream.Position = 0;
-                return memoryStream;
+            }
+            else
+            {
+                throw new ForbidException("Cannot download files from this course.");
             }
         }
 

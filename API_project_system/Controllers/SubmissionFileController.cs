@@ -41,6 +41,8 @@ namespace API_project_system.Controllers
         }
 
         [HttpGet("assignment/{assignmentId}/files")]
+        [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult GetFilesFromAssginment(int assignmentId)
         {
             var file = submissionFileService.GetFilesFromAssignment(assignmentId);
@@ -49,6 +51,8 @@ namespace API_project_system.Controllers
         }
 
         [HttpGet("course/{courseId}/user/{userId}/files")]
+        [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult GetFilesFromUser(int courseId, int userId)
         {
             var file = submissionFileService.GetFilesFromUser(courseId, userId);
@@ -58,6 +62,8 @@ namespace API_project_system.Controllers
 
 
         [HttpGet("course/{courseId}/files")]
+        [Authorize(Roles = "Teacher")]
+        [Authorize(Policy = "IsConfirmed")]
         public ActionResult GetFilesFromCourse(int courseId)
         {
             var file = submissionFileService.GetFilesFromCourse(courseId);
