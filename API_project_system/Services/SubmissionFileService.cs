@@ -192,8 +192,9 @@ namespace API_project_system.Services
                     {
                         foreach (var user in assignment.Course.EnrolledUsers)
                         {
+                            var userArchive = archive.CreateEntry(CreateStudentDirectoryPath(user.Id));
                             string path = CreatePathToUpload(assignment, user.Id);
-                            AddFolderToZip(archive, path, string.Empty);
+                            AddFolderToZip(userArchive.Archive, path, string.Empty);
                         }
 
                     }
