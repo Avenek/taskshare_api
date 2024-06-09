@@ -113,8 +113,8 @@ namespace API_project_system.Services
         {
             string courseDirectoryPath = CreateCourseDirectoryPath(assignment.Course);
             string studentDirectoryPath = CreateStudentDirectoryPath(userId);
-            string assignmetDirectoryPath = CreateAssignmentDirectoryPath(assignment);
-            return Path.Combine(STUDENT_FILES_PATH, courseDirectoryPath, studentDirectoryPath, assignmetDirectoryPath);
+            string assignmentDirectoryPath = CreateAssignmentDirectoryPath(assignment);
+            return Path.Combine(STUDENT_FILES_PATH, courseDirectoryPath, studentDirectoryPath, assignmentDirectoryPath);
         }
 
         public void DeleteFileFromSubmission(int fileId)
@@ -192,10 +192,12 @@ namespace API_project_system.Services
                     {
                         foreach (var user in assignment.Course.EnrolledUsers)
                         {
-                            var userArchive = archive.CreateEntry(CreateStudentDirectoryPath(user.Id));
+                            string userDirectoryPath = CreateStudentDirectoryPath(user.Id);
+                            var userDirectoryEntry = archive.CreateEntry(userDirectoryPath + "/");
+
                             string path = CreatePathToUpload(assignment, user.Id);
-                            AddFolderToZip(userArchive.Archive, path, string.Empty);
-                        }
+                            AddFolderToZip(archive, path, userDirectoryPath);
+                        }   
 
                     }
                     memoryStream.Position = 0;
