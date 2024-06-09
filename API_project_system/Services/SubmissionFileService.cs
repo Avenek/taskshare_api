@@ -237,7 +237,12 @@ namespace API_project_system.Services
 
         public MemoryStream GetFilesFromCourse(int courseId)
         {
-            var course = UnitOfWork.Courses.GetById(courseId);
+            var spec = new CourseByIdWithOwnerSpecification(courseId);
+            var course = UnitOfWork.Courses.GetBySpecification(spec).FirstOrDefault();
+            if (course is null)
+            {
+                throw new NotFoundException("That entity doesn't exist.");
+            }
             var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, course,
                 new ResourceOperationRequirement(ResourseOperation.Update)).Result;
 
