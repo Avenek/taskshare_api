@@ -151,7 +151,7 @@ namespace API_project_system.Services
             {
                 contentType = "application/octet-stream";
             }
-            FileDto fileDto = new FileDto { Content = file, ContentType = contentType };
+            FileDto fileDto = new FileDto { Content = file, ContentType = contentType, Name = Path.GetFileName(submissionFile.FilePath) };
 
             return fileDto;
         }
@@ -255,7 +255,7 @@ namespace API_project_system.Services
                     using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                     {
                         string courseDirectoryPath = CreateCourseDirectoryPath(course);
-                        AddFolderToZip(archive, courseDirectoryPath, string.Empty);
+                        AddFolderToZip(archive, courseDirectoryPath + "/", string.Empty);
                     }
                     memoryStream.Position = 0;
                     return memoryStream;
