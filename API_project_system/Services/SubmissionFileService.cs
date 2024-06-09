@@ -254,7 +254,7 @@ namespace API_project_system.Services
                 {
                     using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                     {
-                        string courseDirectoryPath = Path.GetFullPath(CreateCourseDirectoryPath(course));
+                        string courseDirectoryPath = CreateCourseDirectoryPath(course);
                         AddFolderToZip(archive, courseDirectoryPath, string.Empty);
                     }
                     memoryStream.Position = 0;
@@ -270,6 +270,11 @@ namespace API_project_system.Services
         private void AddFolderToZip(ZipArchive archive, string sourceFolder, string entryName)
         {
             var directoryInfo = new DirectoryInfo(sourceFolder);
+
+            if (!directoryInfo.Exists)
+            {
+                throw new BadRequestException($"Source directory not found: {sourceFolder}");
+            }
 
             foreach (var file in directoryInfo.GetFiles())
             {
