@@ -99,10 +99,10 @@ namespace API_project_system.Services
         }
 
         private string CreateAssignmentDirectoryPath(Assignment assignment) =>
-            $"{assignment.Name.Replace(' ', '_')}";
+            $"{assignment.Name.Replace(' ', '_').Replace(".", string.Empty)}";
 
         private string CreateCourseDirectoryPath(Course course) =>
-            $"{course.Owner.Lastname}_{course.Name.Replace(' ', '_')}_{course.YearStart}_{course.YearStart + 1}";
+            $"{course.Owner.Lastname}_{course.Name.Replace(' ', '_').Replace(".", string.Empty)}_{course.YearStart}_{course.YearStart + 1}";
         private string CreateStudentDirectoryPath(int userId)
         {
             User student = UnitOfWork.Users.GetById(userId);
