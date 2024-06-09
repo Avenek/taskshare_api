@@ -36,7 +36,7 @@ namespace API_project_system.Controllers
         public async Task<ActionResult> GetFileFromSubmission(int submissionId, int fileId)
         {
             var file = await submissionFileService.GetFileFromSubmission(submissionId, fileId);
-            return File(file.Content, file.ContentType, file.Name);
+            return File(file.Content, file.ContentType);
         }
 
         [HttpGet("assignment/{assignmentId}/files")]
